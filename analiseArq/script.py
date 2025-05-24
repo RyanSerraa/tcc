@@ -2,17 +2,14 @@
 import pandas as pd
 
 # Nome do arquivo CSV de entrada
-csv_file = 'crime_data/NYPD_Arrests_Data__Historic_.csv'
+csv_file = 'fperson.csv'
 # Nome do arquivo JSON de saída
 # json_file = 'dump.json'
 
 # Carregar o arquivo CSV
 df = pd.read_csv(csv_file)
 # Amostrar 1% dos dados (ajuste a proporção conforme necessário)
-sampled_df = df.sample(frac=0.01, random_state=42)  # random_state para reprodutibilidade
-
-# Salvar o novo arquivo CSV
-sampled_df.to_csv('NYPD.csv', index=False)
+print(len(df))
 
 # csv_file= "prepareted.csv"
 # # Abrindo o arquivo CSV e lendo os dados
