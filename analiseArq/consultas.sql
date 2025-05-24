@@ -15,7 +15,6 @@ ORDER BY
   DL.state,
   total_deaths DESC;
 
-
   SELECT
   DL.city,
   DDC.description,
