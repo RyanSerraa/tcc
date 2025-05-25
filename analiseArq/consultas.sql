@@ -185,3 +185,76 @@ SELECT DL.state, DDC.description, (COUNT(DDC.description)*1.0/total_count) AS pr
 ) AS total ON 1=1
 GROUP BY DL.state, DDC.description, total.total_count
 ORDER BY  probability_police_killed DESC,DL.state, description;
+
+--Probablidade de morte por genero
+
+SELECT
+  DP.gender,
+  DDC.description,
+  (COUNT(DDC.description) * 1.0 / total.total_count) AS probability_gender_killed
+FROM
+  FFatalEncounters
+  JOIN DPerson DP ON FFatalEncounters.idPerson = DP.id
+  AND FFatalEncounters.idGroupAge = DP.idGroupAge
+  JOIN DDeathCause DDC ON FFatalEncounters.idDeathCause = DDC.id
+  JOIN (
+    SELECT
+      COUNT(*) AS total_count
+    FROM
+      FFatalEncounters
+  ) AS total ON 1 = 1
+GROUP BY
+  DP.gender,
+  DDC.description,
+  total.total_count
+ORDER BY
+  probability_gender_killed DESC;
+
+
+--Probabilidade de morte por raça
+SELECT
+  DP.race,
+  DDC.description,
+  (COUNT(DDC.description) * 1.0 / total.total_count) AS probability_gender_killed
+FROM
+  FFatalEncounters
+  JOIN DPerson DP ON FFatalEncounters.idPerson = DP.id
+  AND FFatalEncounters.idGroupAge = DP.idGroupAge
+  JOIN DDeathCause DDC ON FFatalEncounters.idDeathCause = DDC.id
+  JOIN (
+    SELECT
+      COUNT(*) AS total_count
+    FROM
+      FFatalEncounters
+  ) AS total ON 1 = 1
+GROUP BY
+  DP.race,
+  DDC.description,
+  total.total_count
+ORDER BY
+  probability_gender_killed DESC;
+
+--Probabilidade de morte por genero e raça
+  SELECT
+  DP.gender,
+  DP.race,
+  DDC.description,
+  (COUNT(DDC.description) * 100.0 / total.total_count) AS probability_gender_killed
+FROM
+  FFatalEncounters
+  JOIN DPerson DP ON FFatalEncounters.idPerson = DP.id
+  AND FFatalEncounters.idGroupAge = DP.idGroupAge
+  JOIN DDeathCause DDC ON FFatalEncounters.idDeathCause = DDC.id
+  JOIN (
+    SELECT
+      COUNT(*) AS total_count
+    FROM
+      FFatalEncounters
+  ) AS total ON 1 = 1
+GROUP BY
+  DP.gender,
+  DP.race,
+  DDC.description,
+  total.total_count
+ORDER BY
+  probability_gender_killed DESC;
