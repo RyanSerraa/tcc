@@ -8,7 +8,7 @@ SELECT
   
   d.name AS drug_name,
   
-  w.name AS weapon_name,
+  COALESCE(w.shortname) AS weapon_name,
   
   p.name AS person_name,
   p.sex,
