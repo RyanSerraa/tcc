@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="image-icon.png" type="image/x-icon">
+  <title>Painéis Metabase Turbinados</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+      --card-bg: rgba(255,255,255,0.12);
+      --card-hover: rgba(255,255,255,0.25);
+      --text-color: #fff;
+      --shadow-color: rgba(0,0,0,0.4);
+      --primary-accent: #4ca1af;
+      --secondary-accent: #ff7e5f;
+      --transition-speed: 0.4s;
+    }
+    
+    * { 
+      margin:0; 
+      padding:0; 
+      box-sizing:border-box; 
+    }
+    
+    body {
+      background: var(--bg-gradient);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      color: var(--text-color);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 1rem;
+      line-height: 1.6;
+    }
+    
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    .container {
+      width: 100%; 
+      max-width: 1200px;
+      padding: 2rem;
+      position: relative;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+      position: relative;
+    }
+    
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      position: relative;
+      display: inline-block;
+    }
+    
+    h1::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 4px;
+      background: var(--secondary-accent);
+      border-radius: 2px;
+    }
+    
+    .subtitle {
+      font-size: 1.2rem;
+      opacity: 0.9;
+      max-width: 600px;
+      margin: 0 auto 1.5rem;
+    }
+    
+    .stats-bar {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin: 2rem 0;
+      flex-wrap: wrap;
+    }
+    
+    .stat-item {
+      background: rgba(255,255,255,0.1);
+      padding: 0.8rem 1.5rem;
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      font-weight: 500;
+      backdrop-filter: blur(5px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+    
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    
+    .card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: var(--text-color);
+      font-size: 1.2rem;
+      font-weight: 600;
+      transition: all var(--transition-speed) ease;
+      box-shadow: 0 10px 25px var(--shadow-color);
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.1);
+      transform: translateY(0);
+    }
+    
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: var(--primary-accent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform var(--transition-speed) ease;
+    }
+    
+    .card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
+      opacity: 0;
+      transition: opacity var(--transition-speed) ease;
+    }
+    
+    .card:hover {
+      background: var(--card-hover);
+      transform: translateY(-10px) scale(1.03);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+    }
+    
+    .card:hover::before {
+      transform: scaleX(1);
+    }
+    
+    .card:hover::after {
+      opacity: 1;
+    }
+    
+    .card-icon {
+      font-size: 3rem;
+      margin-bottom: 1.5rem;
+      color: var(--secondary-accent);
+      transition: transform var(--transition-speed) ease;
+    }
+    
+    .card:hover .card-icon {
+      transform: scale(1.2) rotate(5deg);
+    }
+    
+    .card h2 {
+      margin-bottom: 1rem;
+      font-size: 1.5rem;
+      text-align: center;
+    }
+    
+    .card p {
+      font-size: 1rem;
+      opacity: 0.8;
+      text-align: center;
+      font-weight: 400;
+      max-width: 90%;
+    }
+    
+    .card-badge {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: var(--secondary-accent);
+      color: #222;
+      font-size: 0.8rem;
+      font-weight: bold;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    }
+    
+    .footer {
+      margin-top: 4rem;
+      text-align: center;
+      font-size: 0.9rem;
+      opacity: 0.7;
+      padding: 1.5rem;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      width: 100%;
+    }
+    
+    .theme-toggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(255,255,255,0.15);
+      border: none;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      cursor: pointer;
+      color: white;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    
+    .theme-toggle:hover {
+      background: rgba(255,255,255,0.25);
+      transform: rotate(30deg);
+    }
+    
+    /* Responsividade */
+    @media (max-width: 768px) {
+      h1 { font-size: 2.2rem; }
+      .grid { gap: 1.5rem; }
+      .card { padding: 1.5rem; }
+      .stats-bar { gap: 1rem; }
+      .stat-item { padding: 0.6rem 1.2rem; font-size: 0.9rem; }
+    }
+    
+    @media (max-width: 480px) {
+      .container { padding: 1rem; }
+      h1 { font-size: 1.8rem; }
+      .subtitle { font-size: 1rem; }
+      .grid { grid-template-columns: 1fr; }
+      .card-badge { top: 10px; right: 10px; }
+    }
+    
+    /* Animações de entrada */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .header, .grid, .stats-bar {
+      animation: fadeInUp 0.8s ease-out forwards;
+    }
+    
+    .grid { animation-delay: 0.2s; }
+    .stats-bar { animation-delay: 0.4s; }
+    
+    .card:nth-child(2) { animation-delay: 0.3s; }
+    .card:nth-child(3) { animation-delay: 0.4s; }
+    .card:nth-child(4) { animation-delay: 0.5s; }
+    .card:nth-child(5) { animation-delay: 0.6s; }
+  </style>
+</head>
+<body>
+  <button class="theme-toggle" id="themeToggle">
+    <i class="fas fa-moon"></i>
+  </button>
+  
+  <div class="container">
+    <div class="header">
+      <h1>Painéis Interativos</h1>
+    
+    <div class="grid">
+      <a href="https://metabase.example.com/arrests" class="card" target="_blank">
+        <i class="fas fa-handcuffs card-icon"></i>
+        <h2>Arrests</h2>
+        <p>Visualize dados detalhados de prisões com análises temporais e geográficas</p>
+      </a>
+      
+      <a href="https://metabase.example.com/crimes" class="card" target="_blank">
+        <i class="fas fa-gavel card-icon"></i>
+        <h2>Crimes</h2>
+        <p>Análise completa de registros criminais com tendências e padrões</p>
+      </a>
+      
+      <a href="https://metabase.example.com/fatal-encounters" class="card" target="_blank">
+        <i class="fas fa-skull card-icon"></i>
+        <h2>Fatal Encounters</h2>
+        <p>Casos com resultados fatais e análises de circunstâncias</p>
+      </a>
+      
+      <a href="https://metabase.example.com/police-deaths" class="card" target="_blank">
+        <i class="fas fa-heart-broken card-icon"></i>
+        <h2>Police Deaths</h2>
+        <p>Óbitos policiais registrados com análises de causas e prevenção</p>
+      </a>
+      
+      <a href="https://metabase.example.com/shootings" class="card" target="_blank">
+        <i class="fas fa-crosshairs card-icon"></i>
+        <h2>Shootings</h2>
+        <p>Incidentes com arma de fogo e estatísticas de ocorrências</p>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    // Animação de hover para os cards
+    document.querySelectorAll('.card').forEach(card => {
+      card.addEventListener('mousemove', function(e) {
+        const cardRect = this.getBoundingClientRect();
+        const x = e.clientX - cardRect.left;
+        const y = e.clientY - cardRect.top;
+        
+        const centerX = cardRect.width / 2;
+        const centerY = cardRect.height / 2;
+        
+        const angleY = (x - centerX) / 10;
+        const angleX = (centerY - y) / 10;
+        
+        this.style.transform = `perspective(1000px) rotateX(${angleX}deg) rotateY(${angleY}deg) scale(1.03)`;
+      });
+      
+      card.addEventListener('mouseleave', function() {
+        this.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+      });
+    });
+    
+    // Alternador de tema
+    const themeToggle = document.getElementById('themeToggle');
+    themeToggle.addEventListener('click', function() {
+      document.body.classList.toggle('light-theme');
+      
+      if (document.body.classList.contains('light-theme')) {
+        document.documentElement.style.setProperty('--bg-gradient', 'linear-gradient(135deg, #f5f7fa, #c3cfe2)');
+        document.documentElement.style.setProperty('--text-color', '#333');
+        document.documentElement.style.setProperty('--card-bg', 'rgba(255,255,255,0.8)');
+        document.documentElement.style.setProperty('--card-hover', 'rgba(255,255,255,0.95)');
+        document.documentElement.style.setProperty('--shadow-color', 'rgba(0,0,0,0.1)');
+        this.innerHTML = '<i class="fas fa-sun"></i>';
+      } else {
+        document.documentElement.style.setProperty('--bg-gradient', 'linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c)');
+        document.documentElement.style.setProperty('--text-color', '#fff');
+        document.documentElement.style.setProperty('--card-bg', 'rgba(255,255,255,0.12)');
+        document.documentElement.style.setProperty('--card-hover', 'rgba(255,255,255,0.25)');
+        document.documentElement.style.setProperty('--shadow-color', 'rgba(0,0,0,0.4)');
+        this.innerHTML = '<i class="fas fa-moon"></i>';
+      }
+    });
+  </script>
+</body>
+</html>

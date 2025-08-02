@@ -6,18 +6,18 @@ SELECT
 
   COALESCE(dc.shortname) AS death_cause,
   COALESCE(w.shortname) AS weapon_name,
-  d.name AS dept_name,
+  d.name AS police_department_name,
 
   f.threatLevel,
   f.flee,
-  f.bodyCamera,
+  f.bodyCamera as is_police_wearing_camera,
 
   p.name AS person_name,
-  p.sex,
+  p.gender as gender,
   p.race,
   p.typePerson,
-  p.rangeInf,
-  p.rangesup,
+  -- p.rangeInf, # não serve -- da para criar uma outra coluna com o concat 
+  -- p.rangesup,
   p.idGroupAge,
 
   l.state,
