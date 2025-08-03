@@ -1,36 +1,29 @@
 CREATE OR REPLACE VIEW VShootingDetails AS
 SELECT
-  f.year,
-  f.month,
-  f.day,
+  TO_DATE(
+    f.year || '-' || LPAD(f.month::text, 2, '0') || '-' || LPAD(f.day::text, 2, '0'),
+    'YYYY-MM-DD'
+  ) AS date_of_shooting,
 
-  COALESCE(dc.shortname) AS cause_death,
-  COALESCE(w.shortname) AS weapon_name,
+  COALESCE(dc.shortname, 'UNKNOWN') AS cause_of_death,
+  COALESCE(w.shortname, 'UNKNOWN') AS weapon_used,
 
-  f.threatLevel,
-  f.flee,
-  f.bodyCamera,
+  f.threatLevel AS threat_level,
+  f.flee AS flee_status,
+  f.bodyCamera AS is_police_wearing_camera,
 
-  p.name AS person_name,
-  p.sex,
-  p.race,
-  p.typePerson,
-  p.rangeInf,
-  p.rangesup,
-  p.idGroupAge,
+  -- Dados da vítima (pessoa)
+  p.name AS victim_name,
+  p.gender AS victim_gender,
+  p.race AS victim_race,
+  p.typePerson AS victim_type,
+  p.rangeInf || ' - ' || p.rangeSup AS victim_age_range,
+  p.idGroupAge AS victim_age_group_id,
 
-  l.state,
-  l.city,
+  l.state AS state,
+  l.city AS city,
   l.lat AS latitude,
-  l.long AS longitude,
-  l.avgBlack,
-  l.avgWhite,
-  l.avgHispanic,
-  l.avgAsian,
-  l.standardDeviationBlack,
-  l.standardDeviationWhite,
-  l.standardDeviationHispanic,
-  l.standardDeviationAsian
+  l.long AS longitude
 
 FROM FShootings f
 JOIN DDeathCause dc ON f.idCauseDeath = dc.id

@@ -1,37 +1,30 @@
 CREATE OR REPLACE VIEW VFatalEncountersDetails AS
 SELECT
-  f.year,
-  f.month,
-  f.day,
+  TO_DATE(
+    f.year || '-' || LPAD(f.month::text, 2, '0') || '-' || LPAD(f.day::text, 2, '0'),
+    'YYYY-MM-DD'
+  ) AS date_of_death,
 
-  COALESCE(dc.shortname) AS death_cause,
-  COALESCE(w.shortname) AS weapon_name,
-  d.name AS police_department_name,
+  COALESCE(dc.shortname, 'UNKNOWN') AS cause_of_death,
+  COALESCE(w.shortname, 'UNKNOWN') AS weapon_used,
+  d.name AS police_department,
 
-  f.threatLevel,
-  f.flee,
-  f.bodyCamera as is_police_wearing_camera,
+  f.threatLevel AS threat_level,
+  f.flee AS flee_status,
+  f.bodyCamera AS is_police_wearing_camera,
 
-  p.name AS person_name,
-  p.gender as gender,
-  p.race,
-  p.typePerson,
-  -- p.rangeInf, # não serve -- da para criar uma outra coluna com o concat 
-  -- p.rangesup,
-  p.idGroupAge,
+  -- Dados da vítima (pessoa)
+  p.name AS victim_name,
+  p.gender AS victim_gender,
+  p.race AS victim_race,
+  p.typePerson AS victim_type,
+  p.rangeInf || ' - ' || p.rangeSup AS victim_age_range,
+  p.idGroupAge AS victim_age_group_id,
 
-  l.state,
-  l.city,
+  l.state AS state,
+  l.city AS city,
   l.lat AS latitude,
-  l.long AS longitude,
-  l.avgBlack,
-  l.avgWhite,
-  l.avgHispanic,
-  l.avgAsian,
-  l.standardDeviationBlack,
-  l.standardDeviationWhite,
-  l.standardDeviationHispanic,
-  l.standardDeviationAsian
+  l.long AS longitude
 
 FROM FFatalEncounters f
 JOIN DDeathCause dc ON f.idDeathCause = dc.id

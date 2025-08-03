@@ -1,28 +1,27 @@
-CREATE VIEW VArrestDetails AS
+CREATE OR REPLACE VIEW VArrestDetails AS
 SELECT
-  f.year,
-  f.month,
-  f.day,
-  
+  TO_DATE(
+    f.year || '-' || LPAD(f.month::text, 2, '0') || '-' || LPAD(f.day::text, 2, '0'),
+    'YYYY-MM-DD'
+  ) AS date_of_arrest,
+
   c.name AS crime_name,
-  
   d.name AS drug_name,
-  
-  COALESCE(w.shortname) AS weapon_name,
-  
-  p.name AS person_name,
-  p.sex,
-  p.race,
-  p.typePerson,
-  p.rangeInf,
-  p.rangeSup,
-  p.idGroupAge,
-  
-  l.state,
-  l.city,
-  l.lat,
-  l.long
-  
+  COALESCE(w.shortname, 'UNKNOWN') AS weapon_used,
+
+  -- Dados da pessoa criminal
+  p.name AS criminal_name,
+  p.gender AS criminal_gender,
+  p.race AS criminal_race,
+  p.typePerson AS criminal_type,
+  p.rangeInf || ' - ' || p.rangeSup AS criminal_age_range,
+  p.idGroupAge AS criminal_age_group_id,
+
+  l.state AS state,
+  l.city AS city,
+  l.lat AS latitude,
+  l.long AS longitude
+
 FROM FArrest f
 JOIN DCrime c ON f.idCrime = c.id
 JOIN DDrug d ON f.idDrug = d.id
