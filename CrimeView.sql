@@ -1,32 +1,25 @@
 CREATE OR REPLACE VIEW VCrimeDetails AS
 SELECT
-  f.year,
-  f.month,
-  f.day,
+  TO_DATE(
+    f.year || '-' || LPAD(f.month::text, 2, '0') || '-' || LPAD(f.day::text, 2, '0'),
+    'YYYY-MM-DD'
+  ) AS date_of_crime,
 
-  COALESCE(c.shortname) AS crime_name,
-  COALESCE(w.shortname) AS weapon_name,
+  COALESCE(c.shortname, 'UNKNOWN') AS crime_name,
+  COALESCE(w.shortname, 'UNKNOWN') AS weapon_used,
 
-  p.name AS person_name,
-  p.sex,
-  p.race,
-  p.typePerson,
-  p.rangeInf,
-  p.rangeSup,
-  p.idGroupAge,
+  -- Dados da pessoa criminal
+  p.name AS criminal_name,
+  p.gender AS criminal_gender,
+  p.race AS criminal_race,
+  p.typePerson AS criminal_type,
+  p.rangeInf || ' - ' || p.rangeSup AS criminal_age_range,
+  p.idGroupAge AS criminal_age_group_id,
 
-  l.state,
-  l.city,
+  l.state AS state,
+  l.city AS city,
   l.lat AS latitude,
-  l.long AS longitude,
-  l.avgBlack,
-  l.avgWhite,
-  l.avgHispanic,
-  l.avgAsian,
-  l.standardDeviationBlack,
-  l.standardDeviationWhite,
-  l.standardDeviationHispanic,
-  l.standardDeviationAsian
+  l.long AS longitude
 
 FROM FCrime f
 JOIN DCrime c ON f.idCrime = c.id

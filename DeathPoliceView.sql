@@ -1,32 +1,24 @@
 CREATE OR REPLACE VIEW VDeathPoliceDetails AS
 SELECT
-  f.year,
-  f.month,
-  f.day,
+  TO_DATE(
+    f.year || '-' || LPAD(f.month::text, 2, '0') || '-' || LPAD(f.day::text, 2, '0'),
+    'YYYY-MM-DD'
+  ) AS date_of_death,
 
-  COALESCE(dc.shortname) AS death_cause,
-  d.name AS dept_name,
+  COALESCE(dc.shortname, 'UNKNOWN') AS cause_of_death,
+  d.name AS police_department,
 
-  p.name AS person_name,
-  p.sex,
-  p.race,
-  p.typePerson,
-  p.rangeInf,
-  p.rangesup,
-  p.idGroupAge,
+  p.name AS police_name,
+  p.gender AS police_gender,
+  p.race AS police_race,
+  p.typePerson AS police_type,
+  p.rangeInf || ' - ' || p.rangeSup AS police_age_range,
+  p.idGroupAge AS police_age_group_id,
 
-  l.state,
-  l.city,
+  l.state AS state,
+  l.city AS city,
   l.lat AS latitude,
-  l.long AS longitude,
-  l.avgBlack,
-  l.avgWhite,
-  l.avgHispanic,
-  l.avgAsian,
-  l.standardDeviationBlack,
-  l.standardDeviationWhite,
-  l.standardDeviationHispanic,
-  l.standardDeviationAsian
+  l.long AS longitude
 
 FROM FDeathPolice f
 JOIN DDeathCause dc ON f.idDeathCause = dc.id
