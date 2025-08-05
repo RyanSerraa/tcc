@@ -1,0 +1,26 @@
+services:
+  llm:
+    build:
+      context: .
+    volumes:
+      - .:/app:cached
+    ports:
+      - 8501:8501
+    working_dir: /app
+    command: sleep infinity
+    stop_grace_period: 2s
+
+  ollama:
+    build:
+      context: .
+      dockerfile: Dockerfile.ollama
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    restart: always
+    privileged: true
+
+volumes:
+  ollama-data:
