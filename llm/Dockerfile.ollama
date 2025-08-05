@@ -1,0 +1,11 @@
+FROM ollama/ollama
+
+RUN apt-get update && apt-get install -y \
+    make \
+    && rm -rf /var/lib/apt/lists/*
+
+# Crie uma pasta de trabalho
+WORKDIR /root
+
+# Copia o Makefile da raiz do projeto para dentro do container
+COPY Makefile .

@@ -1,0 +1,71 @@
+# Byte-compiled / cache / virtual env
+__pycache__/
+*.py[cod]
+*.so
+*.pyd
+*.pyo
+
+# Virtual environments
+.env/
+.venv/
+venv/
+ENV/
+env/
+*.env
+
+# Python virtual environment tools
+pip-log.txt
+pip-delete-this-directory.txt
+poetry.lock
+poetry.toml
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# VSCode
+.vscode/
+
+# Pytest
+.pytest_cache/
+.cache/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Coverage reports
+htmlcov/
+.coverage
+coverage.xml
+*.cover
+*.py,cover
+
+# PyInstaller
+build/
+dist/
+*.spec
+
+# Streamlit
+.streamlit/config.toml
+.streamlit/secrets.toml
+
+# Logs and temp
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+
+# Database or app files
+*.sqlite3
+instance/
+*.db
+*.db-journal
+
+# MacOS
+.DS_Store
+
+# System files
+Thumbs.db
+ehthumbs.db
