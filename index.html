@@ -17,13 +17,13 @@
       --secondary-accent: #ff7e5f;
       --transition-speed: 0.4s;
     }
-    
-    * { 
-      margin:0; 
-      padding:0; 
-      box-sizing:border-box; 
+
+    * {
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
     }
-    
+
     body {
       background: var(--bg-gradient);
       background-size: 400% 400%;
@@ -36,26 +36,26 @@
       padding: 1rem;
       line-height: 1.6;
     }
-    
+
     @keyframes gradientBG {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-    
+
     .container {
-      width: 100%; 
+      width: 100%;
       max-width: 1200px;
       padding: 2rem;
       position: relative;
     }
-    
+
     .header {
       text-align: center;
       margin-bottom: 3rem;
       position: relative;
     }
-    
+
     h1 {
       font-size: 3rem;
       margin-bottom: 1rem;
@@ -63,7 +63,7 @@
       position: relative;
       display: inline-block;
     }
-    
+
     h1::after {
       content: '';
       position: absolute;
@@ -75,14 +75,14 @@
       background: var(--secondary-accent);
       border-radius: 2px;
     }
-    
+
     .subtitle {
       font-size: 1.2rem;
       opacity: 0.9;
       max-width: 600px;
       margin: 0 auto 1.5rem;
     }
-    
+
     .stats-bar {
       display: flex;
       justify-content: center;
@@ -90,7 +90,7 @@
       margin: 2rem 0;
       flex-wrap: wrap;
     }
-    
+
     .stat-item {
       background: rgba(255,255,255,0.1);
       padding: 0.8rem 1.5rem;
@@ -102,14 +102,14 @@
       backdrop-filter: blur(5px);
       box-shadow: 0 4px 10px rgba(0,0,0,0.15);
     }
-    
+
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 2rem;
       margin-top: 2rem;
     }
-    
+
     .card {
       background: var(--card-bg);
       border-radius: 20px;
@@ -130,7 +130,7 @@
       border: 1px solid rgba(255,255,255,0.1);
       transform: translateY(0);
     }
-    
+
     .card::before {
       content: '';
       position: absolute;
@@ -143,7 +143,7 @@
       transform-origin: left;
       transition: transform var(--transition-speed) ease;
     }
-    
+
     .card::after {
       content: '';
       position: absolute;
@@ -155,38 +155,38 @@
       opacity: 0;
       transition: opacity var(--transition-speed) ease;
     }
-    
+
     .card:hover {
       background: var(--card-hover);
       transform: translateY(-10px) scale(1.03);
       box-shadow: 0 15px 35px rgba(0,0,0,0.5);
     }
-    
+
     .card:hover::before {
       transform: scaleX(1);
     }
-    
+
     .card:hover::after {
       opacity: 1;
     }
-    
+
     .card-icon {
       font-size: 3rem;
       margin-bottom: 1.5rem;
       color: var(--secondary-accent);
       transition: transform var(--transition-speed) ease;
     }
-    
+
     .card:hover .card-icon {
       transform: scale(1.2) rotate(5deg);
     }
-    
+
     .card h2 {
       margin-bottom: 1rem;
       font-size: 1.5rem;
       text-align: center;
     }
-    
+
     .card p {
       font-size: 1rem;
       opacity: 0.8;
@@ -194,7 +194,7 @@
       font-weight: 400;
       max-width: 90%;
     }
-    
+
     .card-badge {
       position: absolute;
       top: 15px;
@@ -207,7 +207,7 @@
       border-radius: 20px;
       box-shadow: 0 3px 8px rgba(0,0,0,0.2);
     }
-    
+
     .footer {
       margin-top: 4rem;
       text-align: center;
@@ -217,7 +217,7 @@
       border-top: 1px solid rgba(255,255,255,0.1);
       width: 100%;
     }
-    
+
     .theme-toggle {
       position: absolute;
       top: 20px;
@@ -237,12 +237,44 @@
       backdrop-filter: blur(5px);
       box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
-    
+
     .theme-toggle:hover {
       background: rgba(255,255,255,0.25);
       transform: rotate(30deg);
     }
-    
+
+    /* Chat Icon */
+    .chat-icon {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      background: var(--secondary-accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.8rem;
+      cursor: pointer;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+      z-index: 1000;
+      animation: pulse 2s infinite;
+    }
+
+    .chat-icon:hover {
+      transform: scale(1.1);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(255, 126, 95, 0.7); }
+      70% { box-shadow: 0 0 0 15px rgba(255, 126, 95, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 126, 95, 0); }
+    }
+
     /* Responsividade */
     @media (max-width: 768px) {
       h1 { font-size: 2.2rem; }
@@ -250,8 +282,15 @@
       .card { padding: 1.5rem; }
       .stats-bar { gap: 1rem; }
       .stat-item { padding: 0.6rem 1.2rem; font-size: 0.9rem; }
+      .chat-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+        bottom: 20px;
+        right: 20px;
+      }
     }
-    
+
     @media (max-width: 480px) {
       .container { padding: 1rem; }
       h1 { font-size: 1.8rem; }
@@ -259,7 +298,7 @@
       .grid { grid-template-columns: 1fr; }
       .card-badge { top: 10px; right: 10px; }
     }
-    
+
     /* Animações de entrada */
     @keyframes fadeInUp {
       from {
@@ -271,14 +310,14 @@
         transform: translateY(0);
       }
     }
-    
+
     .header, .grid, .stats-bar {
       animation: fadeInUp 0.8s ease-out forwards;
     }
-    
+
     .grid { animation-delay: 0.2s; }
     .stats-bar { animation-delay: 0.4s; }
-    
+
     .card:nth-child(2) { animation-delay: 0.3s; }
     .card:nth-child(3) { animation-delay: 0.4s; }
     .card:nth-child(4) { animation-delay: 0.5s; }
@@ -289,36 +328,41 @@
   <button class="theme-toggle" id="themeToggle">
     <i class="fas fa-moon"></i>
   </button>
-  
+
+  <!-- Chat Icon - Substitua o # pelo seu link -->
+  <a href="http://localhost:8501/" class="chat-icon" id="chatIcon" target="_blank">
+    <i class="fas fa-comment-dots"></i>
+  </a>
+
   <div class="container">
     <div class="header">
       <h1>Painéis Interativos</h1>
-    
+
     <div class="grid">
       <a href="http://161.35.61.141:3000/public/dashboard/95ac4087-b5b8-45af-9a87-668741ffa295" class="card" target="_blank">
         <i class="fas fa-handcuffs card-icon"></i>
         <h2>Arrests</h2>
         <p>Visualize dados detalhados de prisões com análises temporais e geográficas</p>
       </a>
-      
+
       <a href="http://161.35.61.141:3000/public/dashboard/af56ff3c-24f0-409f-b3f1-5a6c2bf4dddc" class="card" target="_blank">
         <i class="fas fa-gavel card-icon"></i>
         <h2>Crimes</h2>
         <p>Análise completa de registros criminais com tendências e padrões</p>
       </a>
-      
+
       <a href="http://161.35.61.141:3000/public/dashboard/7c38c974-4ee2-43df-895c-d44bbd701ed9" class="card" target="_blank">
         <i class="fas fa-skull card-icon"></i>
         <h2>Fatal Encounters</h2>
         <p>Casos com resultados fatais e análises de circunstâncias</p>
       </a>
-      
+
       <a href="http://161.35.61.141:3000/public/dashboard/a81a61ba-5c63-4e3f-b6a0-e3efba33feae" class="card" target="_blank">
         <i class="fas fa-heart-broken card-icon"></i>
         <h2>Police Deaths</h2>
         <p>Óbitos policiais registrados com análises de causas e prevenção</p>
       </a>
-      
+
       <a href="http://161.35.61.141:3000/public/dashboard/18d44459-68c1-4f5a-af24-0a05711bdc62" class="card" target="_blank">
         <i class="fas fa-crosshairs card-icon"></i>
         <h2>Shootings</h2>
@@ -334,26 +378,26 @@
         const cardRect = this.getBoundingClientRect();
         const x = e.clientX - cardRect.left;
         const y = e.clientY - cardRect.top;
-        
+
         const centerX = cardRect.width / 2;
         const centerY = cardRect.height / 2;
-        
+
         const angleY = (x - centerX) / 10;
         const angleX = (centerY - y) / 10;
-        
+
         this.style.transform = `perspective(1000px) rotateX(${angleX}deg) rotateY(${angleY}deg) scale(1.03)`;
       });
-      
+
       card.addEventListener('mouseleave', function() {
         this.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
       });
     });
-    
+
     // Alternador de tema
     const themeToggle = document.getElementById('themeToggle');
     themeToggle.addEventListener('click', function() {
       document.body.classList.toggle('light-theme');
-      
+
       if (document.body.classList.contains('light-theme')) {
         document.documentElement.style.setProperty('--bg-gradient', 'linear-gradient(135deg, #f5f7fa, #c3cfe2)');
         document.documentElement.style.setProperty('--text-color', '#333');
