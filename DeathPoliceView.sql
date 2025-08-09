@@ -8,15 +8,10 @@ SELECT
   COALESCE(dc.shortname, 'UNKNOWN') AS cause_of_death,
   d.name AS police_department,
 
-  p.name AS police_name,
-  p.gender AS police_gender,
-  p.race AS police_race,
-  p.typePerson AS police_type,
-  p.rangeInf || ' - ' || p.rangeSup AS police_age_range,
-  p.idGroupAge AS police_age_group_id,
-
-  l.state AS state,
-  l.city AS city,
+  p.typePerson AS police_type, -- possible value POLICE
+  
+  l.state AS state, -- state of usa
+  l.city AS city, -- citys of usa
   l.lat AS latitude,
   l.long AS longitude
 
