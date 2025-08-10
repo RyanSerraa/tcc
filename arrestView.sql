@@ -6,19 +6,17 @@ SELECT
   ) AS date_of_arrest,
 
   c.name AS crime_name,
-  d.name AS drug_name,
-  COALESCE(w.shortname, 'UNKNOWN') AS weapon_used,
-
+  d.name AS drug_name, -- possibles values: 'CONTROLLED SUBSTANCE', 'CRACK COCAINE', 'ECSTACY', 'GHB', 'HEROIN', 'HYDROCODONE', 'KETAMINE', 'MARIJUANA', 'METHAMPHETAMINE', 'OXYCODONE', 'PARAPHERNALIA', 'POWDER COCAINE'
+  COALESCE(w.shortname, 'UNKNOWN') AS weapon_used, -- weapon of arrest
+  
   -- Dados da pessoa criminal
-  p.name AS criminal_name,
-  p.gender AS criminal_gender,
-  p.race AS criminal_race,
-  p.typePerson AS criminal_type,
+  p.gender AS criminal_gender, -- possibles values: 'MALE', 'FEMALE', 'UNKNOWN', 'OTHERS'
+  p.race AS criminal_race, -- possibles values: 'WHITE', 'BLACK', 'ASIAN', 'UNKNOWN', 'HISPANIC', 'OTHERS'
+  p.typePerson AS criminal_type, -- possibles values: 'CRIMINAL'
   p.rangeInf || ' - ' || p.rangeSup AS criminal_age_range,
-  p.idGroupAge AS criminal_age_group_id,
 
-  l.state AS state,
-  l.city AS city,
+  l.state AS state, -- state of usa
+  l.city AS city, -- citys of usa
   l.lat AS latitude,
   l.long AS longitude
 
