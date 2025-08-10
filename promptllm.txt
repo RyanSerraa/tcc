@@ -48,6 +48,35 @@ VIEW VDeathPoliceDetails (
     longitude NUMERIC
 )
 
+VIEW VCrimeDetails (
+    date_of_crime DATE,
+    crime_name TEXT,
+    weapon_used TEXT,
+    criminal_gender TEXT,
+    criminal_race TEXT,
+    criminal_type TEXT,
+    criminal_age_range TEXT,
+    state TEXT,
+    city TEXT,
+    latitude NUMERIC,
+    longitude NUMERIC
+)
+
+VIEW VArrestDetails (
+    date_of_arrest DATE,
+    crime_name TEXT,
+    drug_name TEXT,
+    weapon_used TEXT,
+    criminal_gender TEXT,
+    criminal_race TEXT,
+    criminal_type TEXT,
+    criminal_age_range TEXT,
+    state TEXT,
+    city TEXT,
+    latitude NUMERIC,
+    longitude NUMERIC
+)
+
 Mandatory rules:
 1. Always return only valid PostgreSQL SQL code, with no extra text, explanations, or comments.
 2. Do not use SELECT * — always specify the exact columns needed.
@@ -103,3 +132,113 @@ SELECT state, COUNT(*) AS total_deaths
 FROM VDeathPoliceDetails
 GROUP BY state
 ORDER BY total_deaths DESC;
+
+Question: "Tell me the main crime by state."
+Answer:
+WITH RankedCrimes AS (
+    SELECT
+        state,
+        crime_name,
+        COUNT(*) AS total_crimes,
+        ROW_NUMBER() OVER(PARTITION BY state ORDER BY COUNT(*) DESC) AS rn
+    FROM
+        VCrimeDetails
+    WHERE
+        state IS NOT NULL AND crime_name IS NOT NULL
+    GROUP BY
+        state,
+        crime_name
+)
+SELECT
+    state,
+    crime_name,
+    total_crimes
+FROM
+    RankedCrimes
+WHERE
+    rn = 1
+ORDER BY
+    state;
+
+Question: "What are the top 5 crimes by race in arrests?"
+Answer:
+WITH RankedArrests AS (
+    SELECT
+        criminal_race,
+        crime_name,
+        COUNT(*) AS total_arrests,
+        ROW_NUMBER() OVER(PARTITION BY criminal_race ORDER BY COUNT(*) DESC) AS rn
+    FROM
+        VArrestDetails
+    WHERE
+        criminal_race IS NOT NULL AND crime_name IS NOT NULL
+    GROUP BY
+        criminal_race,
+        crime_name
+)
+SELECT
+    criminal_race,
+    crime_name,
+    total_arrests
+FROM
+    RankedArrests
+WHERE
+    rn <= 5
+ORDER BY
+    criminal_race,
+    total_arrests DESC;
+
+Question: "List the number of arrests by criminal gender and the top 3 cities for each gender."
+Answer:
+WITH RankedCities AS (
+    SELECT
+        criminal_gender,
+        city,
+        COUNT(*) AS total_arrests,
+        ROW_NUMBER() OVER(PARTITION BY criminal_gender ORDER BY COUNT(*) DESC) AS rn
+    FROM
+        VArrestDetails
+    WHERE
+        criminal_gender IS NOT NULL AND city IS NOT NULL
+    GROUP BY
+        criminal_gender,
+        city
+)
+SELECT
+    criminal_gender,
+    city,
+    total_arrests
+FROM
+    RankedCities
+WHERE
+    rn <= 3
+ORDER BY
+    criminal_gender,
+    total_arrests DESC;
+
+Question: "Show the most common crime in each city, where the criminal is of 'BLACK' race."
+Answer:
+WITH RankedCrimes AS (
+    SELECT
+        city,
+        crime_name,
+        COUNT(*) AS total_crimes,
+        ROW_NUMBER() OVER(PARTITION BY city ORDER BY COUNT(*) DESC) AS rn
+    FROM
+        VCrimeDetails
+    WHERE
+        city IS NOT NULL AND crime_name IS NOT NULL AND criminal_race = 'BLACK'
+    GROUP BY
+        city,
+        crime_name
+)
+SELECT
+    city,
+    crime_name,
+    total_crimes
+FROM
+    RankedCrimes
+WHERE
+    rn = 1
+ORDER BY
+    city;
