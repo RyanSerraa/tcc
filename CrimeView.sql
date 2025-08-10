@@ -6,18 +6,16 @@ SELECT
   ) AS date_of_crime,
 
   COALESCE(c.shortname, 'UNKNOWN') AS crime_name,
-  COALESCE(w.shortname, 'UNKNOWN') AS weapon_used,
+  COALESCE(w.shortname, 'UNKNOWN') AS weapon_used, -- criminal weapon used
 
   -- Dados da pessoa criminal
-  p.name AS criminal_name,
-  p.gender AS criminal_gender,
-  p.race AS criminal_race,
-  p.typePerson AS criminal_type,
+  p.gender AS criminal_gender, -- possibles values: 'MALE', 'FEMALE', 'UNKNOWN', 'OTHERS'
+  p.race AS criminal_race, -- possibles values: 'WHITE', 'BLACK', 'ASIAN', 'UNKNOWN', 'HISPANIC', 'OTHERS'
+  p.typePerson AS criminal_type, -- possibles values: 'CRIMINAL'
   p.rangeInf || ' - ' || p.rangeSup AS criminal_age_range,
-  p.idGroupAge AS criminal_age_group_id,
 
-  l.state AS state,
-  l.city AS city,
+  l.state AS state, -- state of usa
+  l.city AS city, -- city of usa
   l.lat AS latitude,
   l.long AS longitude
 
