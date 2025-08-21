@@ -1,18 +1,50 @@
-import re
 import os
+import json
+from openai import OpenAI
 import streamlit as st
-from langchain_ollama.llms import OllamaLLM
-from langchain_core.prompts import ChatPromptTemplate
+import re
+import pandas as pd
+import psycopg2
 from dotenv import load_dotenv
 
-# Configuração inicial
 load_dotenv()
+
 st.set_page_config(
     page_title="Text-to-SQL Converter",
     page_icon=":database:",
     layout="wide",
     initial_sidebar_state="expanded",
 )
+
+
+def get_connection():
+    DATABASE_URL = os.getenv("DATABASE_URL")
+    return psycopg2.connect(DATABASE_URL)
+
+
+def run_query(sql_query: str):
+    conn = get_connection()
+    print("Conexão estabelecida")
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute(sql_query)
+            print("Consulta executada")
+            if sql_query.strip().lower().startswith("select"):
+                # Busca aos poucos, evita travar memória
+                chunk_size = 1000
+                data = []
+                while True:
+                    rows = cursor.fetchmany(chunk_size)
+                    if not rows:
+                        break
+                    data.extend(rows)
+                columns = [desc[0] for desc in cursor.description]
+                return pd.DataFrame(data, columns=columns)
+            else:
+                conn.commit()
+                return f"{cursor.rowcount} linhas afetadas"
+    finally:
+        conn.close()
 
 
 # Carrega o conteúdo do schema externo
@@ -24,37 +56,288 @@ def load_schema():
 
 schema_text = load_schema()
 
-# Prompt base com placeholder para schema e query
-template = """
-You are a SQL generator. You MUST output only the SQL query—no explanations, no markdown, no commentary.
+prompt = """
+You are an SQL query generator for PostgreSQL.
 
-SCHEMA:
-{schema}
+You must use exclusively the following views to answer all questions:
 
-QUESTION:
-{query}
+VIEW VFatalEncountersDetails (
+    date_of_death DATE,
+    cause_of_death TEXT,             -- possible values: 'UNKNOWN', other short cause of death names
+    weapon_used TEXT,                -- possible values: 'UNKNOWN', other short weapon names
+    police_department TEXT,
+    threat_status TEXT,              -- 'ATTACK', 'OTHER', 'UNKNOWN'
+    flee_status TEXT,                -- 'VEHICLE', 'FOOT', 'UNKNOWN', 'NOT FLEEING'
+    is_police_wearing_camera BOOLEAN,
+    victim_gender TEXT,              -- 'MALE', 'FEMALE', 'UNKNOWN', 'OTHERS'
+    victim_race TEXT,                -- 'WHITE', 'BLACK', 'ASIAN', 'UNKNOWN', 'HISPANIC', 'OTHERS'
+    victim_type TEXT,                -- 'POLICE', 'VICTIM', 'CRIMINAL'
+    victim_age_range TEXT,
+    state TEXT,
+    city TEXT,
+    latitude NUMERIC,
+    longitude NUMERIC
+)
 
-SQL:
+VIEW VShootingDetails (
+    date_of_shooting DATE,
+    cause_of_death TEXT,             -- possible values: 'UNKNOWN', other short cause of death names
+    weapon_used TEXT,                -- possible values: 'UNKNOWN', other short weapon names
+    threat_status TEXT,              -- 'ATTACK', 'OTHER', 'UNKNOWN'
+    flee_status TEXT,                -- 'VEHICLE', 'FOOT', 'UNKNOWN', 'NOT FLEEING'
+    is_police_wearing_camera BOOLEAN,
+    victim_gender TEXT,              -- 'MALE', 'FEMALE', 'UNKNOWN', 'OTHERS'
+    victim_race TEXT,                -- 'WHITE', 'BLACK', 'ASIAN', 'UNKNOWN', 'HISPANIC', 'OTHERS'
+    victim_type TEXT,                -- 'POLICE', 'VICTIM', 'CRIMINAL'
+    victim_age_range TEXT,
+    state TEXT,
+    city TEXT,
+    latitude NUMERIC,
+    longitude NUMERIC
+)
+
+VIEW VDeathPoliceDetails (
+    date_of_death DATE,
+    cause_of_death TEXT,             -- possible values: 'UNKNOWN', other short cause of death names
+    police_department TEXT,
+    police_type TEXT,                -- possible value: 'POLICE'
+    state TEXT,
+    city TEXT,
+    latitude NUMERIC,
+    longitude NUMERIC
+)
+
+VIEW VCrimeDetails (
+    date_of_crime DATE,
+    crime_name TEXT,
+    weapon_used TEXT,
+    criminal_gender TEXT,
+    criminal_race TEXT,
+    criminal_type TEXT,
+    criminal_age_range TEXT,
+    state TEXT,
+    city TEXT,
+    latitude NUMERIC,
+    longitude NUMERIC
+)
+
+VIEW VArrestDetails (
+    date_of_arrest DATE,
+    crime_name TEXT,
+    drug_name TEXT,
+    weapon_used TEXT,
+    criminal_gender TEXT,
+    criminal_race TEXT,
+    criminal_type TEXT,
+    criminal_age_range TEXT,
+    state TEXT,
+    city TEXT,
+    latitude NUMERIC,
+    longitude NUMERIC
+)
+
+Mandatory rules:
+1. Always return only valid PostgreSQL SQL code, with no extra text, explanations, or comments.
+2. Do not use SELECT * — always specify the exact columns needed.
+3. Use clear aliases for tables or columns when needed.
+4. For date filters, use the 'YYYY-MM-DD' format or PostgreSQL date functions.
+5. When filtering by categorical values (such as gender, race, threat_status, police_type), use the exact values listed in the schema.
+6. You may use CTEs (Common Table Expressions) when needed to improve query readability.
+
+Examples:
+Question: "List the 10 cities with the highest number of female victims in fatal encounters."
+Answer:
+SELECT city, COUNT(*) AS total_cases
+FROM VFatalEncountersDetails
+WHERE victim_gender = 'FEMALE'
+GROUP BY city
+ORDER BY total_cases DESC
+LIMIT 10;
+
+Question: "Show the number of cases of victims fleeing on foot by state in fatal encounters."
+Answer:
+SELECT state, COUNT(*) AS total_cases
+FROM VFatalEncountersDetails
+WHERE flee_status = 'FOOT'
+GROUP BY state
+ORDER BY total_cases DESC;
+
+Question: "List the top 5 cities with the most shootings involving male victims."
+Answer:
+SELECT city, COUNT(*) AS total_shootings
+FROM VShootingDetails
+WHERE victim_gender = 'MALE'
+GROUP BY city
+ORDER BY total_shootings DESC
+LIMIT 5;
+
+Question: "Count the number of shootings where police were wearing body cameras."
+Answer:
+SELECT COUNT(*) AS total_shootings_with_cameras
+FROM VShootingDetails
+WHERE is_police_wearing_camera = TRUE;
+
+Question: "List police departments with more than 10 deaths of police officers."
+Answer:
+SELECT police_department, COUNT(*) AS total_deaths
+FROM VDeathPoliceDetails
+GROUP BY police_department
+HAVING COUNT(*) > 10
+ORDER BY total_deaths DESC;
+
+Question: "Show the number of police deaths by state."
+Answer:
+SELECT state, COUNT(*) AS total_deaths
+FROM VDeathPoliceDetails
+GROUP BY state
+ORDER BY total_deaths DESC;
+
+Question: "Tell me the main crime by state."
+Answer:
+WITH RankedCrimes AS (
+    SELECT
+        state,
+        crime_name,
+        COUNT(*) AS total_crimes,
+        ROW_NUMBER() OVER(PARTITION BY state ORDER BY COUNT(*) DESC) AS rn
+    FROM
+        VCrimeDetails
+    WHERE
+        state IS NOT NULL AND crime_name IS NOT NULL
+    GROUP BY
+        state,
+        crime_name
+)
+SELECT
+    state,
+    crime_name,
+    total_crimes
+FROM
+    RankedCrimes
+WHERE
+    rn = 1
+ORDER BY
+    state;
+
+Question: "What are the top 5 crimes by race in arrests?"
+Answer:
+WITH RankedArrests AS (
+    SELECT
+        criminal_race,
+        crime_name,
+        COUNT(*) AS total_arrests,
+        ROW_NUMBER() OVER(PARTITION BY criminal_race ORDER BY COUNT(*) DESC) AS rn
+    FROM
+        VArrestDetails
+    WHERE
+        criminal_race IS NOT NULL AND crime_name IS NOT NULL
+    GROUP BY
+        criminal_race,
+        crime_name
+)
+SELECT
+    criminal_race,
+    crime_name,
+    total_arrests
+FROM
+    RankedArrests
+WHERE
+    rn <= 5
+ORDER BY
+    criminal_race,
+    total_arrests DESC;
+
+Question: "List the number of arrests by criminal gender and the top 3 cities for each gender."
+Answer:
+WITH RankedCities AS (
+    SELECT
+        criminal_gender,
+        city,
+        COUNT(*) AS total_arrests,
+        ROW_NUMBER() OVER(PARTITION BY criminal_gender ORDER BY COUNT(*) DESC) AS rn
+    FROM
+        VArrestDetails
+    WHERE
+        criminal_gender IS NOT NULL AND city IS NOT NULL
+    GROUP BY
+        criminal_gender,
+        city
+)
+SELECT
+    criminal_gender,
+    city,
+    total_arrests
+FROM
+    RankedCities
+WHERE
+    rn <= 3
+ORDER BY
+    criminal_gender,
+    total_arrests DESC;
+
+Question: "Show the most common crime in each city, where the criminal is of 'BLACK' race."
+Answer:
+WITH RankedCrimes AS (
+    SELECT
+        city,
+        crime_name,
+        COUNT(*) AS total_crimes,
+        ROW_NUMBER() OVER(PARTITION BY city ORDER BY COUNT(*) DESC) AS rn
+    FROM
+        VCrimeDetails
+    WHERE
+        city IS NOT NULL AND crime_name IS NOT NULL AND criminal_race = 'BLACK'
+    GROUP BY
+        city,
+        crime_name
+)
+SELECT
+    city,
+    crime_name,
+    total_crimes
+FROM
+    RankedCrimes
+WHERE
+    rn = 1
+ORDER BY
+    city;
+
 """
 
 
 # Inicializa o modelo
 @st.cache_resource
-def load_model():
-    return OllamaLLM(model="deepseek-r1:7b", base_url="http://ollama:11434")
+def load_agent():
+    base_url = os.getenv("DO_AGENT_ENDPOINT") + "/api/v1"
+    api_key = os.getenv("DO_API_KEY")
+    client = OpenAI(base_url=base_url, api_key=api_key)
+    return client
 
 
-model = load_model()
+client = load_agent()
 
 
-def to_sql_query(query, schema):
-    prompt = ChatPromptTemplate.from_template(template)
-    chain = prompt | model
-    return clean_text(chain.invoke({"query": query, "schema": schema}))
+@st.cache_data(ttl=3600)
+def to_sql_query(user_query: str) -> str:
+    final_prompt = f"{prompt}\n\nQUESTION:\n{user_query}\n\nSQL:"
+
+    response = client.chat.completions.create(
+        model="n/a",  # ou outro modelo se você tiver
+        messages=[{"role": "user", "content": final_prompt}],
+        extra_body={"include_retrieval_info": True},
+        max_tokens=512,
+        temperature=0,
+    )
+
+    # Extrai o conteúdo do retorno
+    content = ""
+    for choice in response.choices:
+        content += choice.message.content
+
+    return clean_text(content)
 
 
 def clean_text(text: str) -> str:
-    # Se houver bloco de código SQL, extrai somente ele
     match = re.search(r"```sql(.*?)```", text, re.DOTALL | re.IGNORECASE)
     if match:
         return match.group(1).strip()
@@ -389,32 +672,39 @@ with col_right:
         label_visibility="collapsed",
     )
 
+    # Inicializa na sessão se ainda não existir
+    if "sql_query" not in st.session_state:
+        st.session_state.sql_query = ""
+
+    # Botão para gerar SQL
     if st.button("Gerar Consulta SQL", type="primary"):
         if not query:
             st.warning("Por favor, insira uma descrição antes de gerar o SQL.")
         else:
-            with st.spinner("🧠 Processando sua solicitação..."):
+            with st.spinner("🧠 Gerando SQL..."):
                 try:
-                    sql_query = to_sql_query(query, schema_text)
-
-                    st.markdown("### 🔍 Resultado")
-                    st.code(sql_query, language="sql")
-
-                    # Botões de ação
-                    col1, col2 = st.columns([1, 1])
-                    with col1:
-                        st.download_button(
-                            label="📥 Baixar SQL",
-                            data=sql_query,
-                            file_name="query_generated.sql",
-                            mime="text/plain",
-                        )
-                    with col2:
-                        if st.button("🔄 Gerar Novamente"):
-                            st.experimental_rerun()
-
+                    st.session_state.sql_query = to_sql_query(query)
                 except Exception as e:
                     st.error(f"⚠️ Ocorreu um erro ao gerar a consulta: {str(e)}")
+
+    # Mostra SQL gerado
+    if st.session_state.sql_query:
+        st.markdown("### 🔍 SQL Gerado")
+        st.code(st.session_state.sql_query, language="sql")
+
+        # Botão para executar query
+        if st.button("Executar Query", type="secondary"):
+            with st.spinner("📊 Executando query..."):
+                try:
+                    result = run_query(st.session_state.sql_query)
+                    st.markdown("### 📊 Resultado da Query")
+                    if isinstance(result, pd.DataFrame):
+                        st.dataframe(result.head(500))
+                    else:
+                        st.success(result)
+                except Exception as db_err:
+                    st.error(f"Erro ao executar a query: {str(db_err)}")
+
 
 # Rodapé
 st.markdown("---")

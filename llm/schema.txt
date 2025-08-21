@@ -1,121 +1,74 @@
-Tables and columns:
+VIEW VFatalEncountersDetails (
+    date_of_death DATE,
+    cause_of_death TEXT,             -- possible values: 'UNKNOWN', other short cause of death names
+    weapon_used TEXT,                -- possible values: 'UNKNOWN', other short weapon names
+    police_department TEXT,
+    threat_status TEXT,              -- 'ATTACK', 'OTHER', 'UNKNOWN'
+    flee_status TEXT,                -- 'VEHICLE', 'FOOT', 'UNKNOWN', 'NOT FLEEING'
+    is_police_wearing_camera BOOLEAN,
+    victim_gender TEXT,              -- 'MALE', 'FEMALE', 'UNKNOWN', 'OTHERS'
+    victim_race TEXT,                -- 'WHITE', 'BLACK', 'ASIAN', 'UNKNOWN', 'HISPANIC', 'OTHERS'
+    victim_type TEXT,                -- 'POLICE', 'VICTIM', 'CRIMINAL'
+    victim_age_range TEXT,
+    state TEXT,
+    city TEXT,
+    latitude NUMERIC,
+    longitude NUMERIC
+)
 
-Table: DLocal
-- id: UUID (primary key)
-- state: VARCHAR(255)
-- city: VARCHAR(255)
-- latitude: DECIMAL(9,6)
-- longitude: DECIMAL(9,6)
-- avgBlack: REAL
-- avgWhite: REAL
-- avgHispanic: REAL
-- avgAsian: REAL
-- standardDeviationBlack: REAL
-- standardDeviationWhite: REAL
-- standardDeviationHispanic: REAL
-- standardDeviationAsian: REAL
+VIEW VShootingDetails (
+    date_of_shooting DATE,
+    cause_of_death TEXT,             -- possible values: 'UNKNOWN', other short cause of death names
+    weapon_used TEXT,                -- possible values: 'UNKNOWN', other short weapon names
+    threat_status TEXT,              -- 'ATTACK', 'OTHER', 'UNKNOWN'
+    flee_status TEXT,                -- 'VEHICLE', 'FOOT', 'UNKNOWN', 'NOT FLEEING'
+    is_police_wearing_camera BOOLEAN,
+    victim_gender TEXT,              -- 'MALE', 'FEMALE', 'UNKNOWN', 'OTHERS'
+    victim_race TEXT,                -- 'WHITE', 'BLACK', 'ASIAN', 'UNKNOWN', 'HISPANIC', 'OTHERS'
+    victim_type TEXT,                -- 'POLICE', 'VICTIM', 'CRIMINAL'
+    victim_age_range TEXT,
+    state TEXT,
+    city TEXT,
+    latitude NUMERIC,
+    longitude NUMERIC
+)
 
-Table: DPerson
-- id: UUID
-- idGroupAge: INTEGER
-- name: VARCHAR(255)
-- gender: gender_enum
-- race: race_enum
-- typePerson: type_enum
-- rangeInf: INTEGER
-- rangeSup: INTEGER
-- PRIMARY KEY: (id, idGroupAge)
+VIEW VDeathPoliceDetails (
+    date_of_death DATE,
+    cause_of_death TEXT,             -- possible values: 'UNKNOWN', other short cause of death names
+    police_department TEXT,
+    police_type TEXT,                -- possible value: 'POLICE'
+    state TEXT,
+    city TEXT,
+    latitude NUMERIC,
+    longitude NUMERIC
+)
 
-Table: DCrime
-- id: UUID (primary key)
-- name: VARCHAR(255)
-- shortName: VARCHAR(255)
+VIEW VCrimeDetails (
+    date_of_crime DATE,
+    crime_name TEXT,
+    weapon_used TEXT,
+    criminal_gender TEXT,
+    criminal_race TEXT,
+    criminal_type TEXT,
+    criminal_age_range TEXT,
+    state TEXT,
+    city TEXT,
+    latitude NUMERIC,
+    longitude NUMERIC
+)
 
-Table: DDrug
-- id: UUID (primary key)
-- name: VARCHAR(255)
-
-Table: DDeathCause
-- id: UUID (primary key)
-- description: VARCHAR(255)
-- shortDesc: VARCHAR(255)
-
-Table: DDept
-- id: UUID (primary key)
-- name: VARCHAR(255)
-
-Table: DWeapon
-- id: UUID (primary key)
-- name: VARCHAR(255)
-- shortName: VARCHAR(255)
-
-Table: FDeathPolice
-- idPerson: UUID
-- idGroupAge: INTEGER
-- idDeathCause: UUID
-- idDept: UUID
-- idLocal: UUID
-- day: INTEGER
-- month: INTEGER
-- year: INTEGER
-- PRIMARY KEY: idPerson
-
-Table: FShootings
-- idPerson: UUID
-- idWeapon: UUID
-- idGroupAge: INTEGER
-- idLocal: UUID
-- idDeathCause: UUID
-- threatLevel: threat_enum
-- flee: flee_enum
-- bodyCamera: BOOLEAN
-- day: INTEGER
-- month: INTEGER
-- year: INTEGER
-- PRIMARY KEY: idPerson
-
-Table: FFatalEncounters
-- idPerson: UUID
-- idGroupAge: INTEGER
-- idDeathCause: UUID
-- idWeapon: UUID
-- idDept: UUID
-- idLocal: UUID
-- threatLevel: threat_enum
-- flee: flee_enum
-- bodyCamera: BOOLEAN
-- year: INTEGER
-- month: INTEGER
-- day: INTEGER
-- PRIMARY KEY: idPerson
-
-Table: FArrest
-- idCrime: UUID
-- idLocal: UUID
-- idPerson: UUID
-- idGroupAge: INTEGER
-- idWeapon: UUID
-- idDrug: UUID
-- year: INTEGER
-- month: INTEGER
-- day: INTEGER
-- PRIMARY KEY: (idCrime, idLocal, idPerson, idGroupAge, idWeapon, idDrug, day, month, year)
-
-Table: FCrime
-- idCrime: UUID
-- idPerson: UUID
-- idGroupAge: INTEGER
-- idWeapon: UUID
-- idLocal: UUID
-- year: INTEGER
-- month: INTEGER
-- day: INTEGER
-- PRIMARY KEY: (idCrime, idPerson, idGroupAge, idWeapon, idLocal, day, month, year)
-
-Enums:
-
-- race_enum: 'WHITE', 'BLACK', 'ASIAN', 'UNKNOWN', 'HISPANIC', 'OTHERS'
-- type_enum: 'POLICE', 'VICTIM', 'CRIMINAL'
-- threat_enum: 'ATTACK', 'OTHER', 'UNKNOWN'
-- flee_enum: 'VEHICLE', 'FOOT', 'UNKNOWN', 'NOT FLEEING'
-- gender_enum: 'MALE', 'FEMALE', 'UNKNOWN', 'OTHERS'
+VIEW VArrestDetails (
+    date_of_arrest DATE,
+    crime_name TEXT,
+    drug_name TEXT,
+    weapon_used TEXT,
+    criminal_gender TEXT,
+    criminal_race TEXT,
+    criminal_type TEXT,
+    criminal_age_range TEXT,
+    state TEXT,
+    city TEXT,
+    latitude NUMERIC,
+    longitude NUMERIC
+)
