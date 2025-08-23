@@ -1,32 +1,32 @@
-CREATE OR REPLACE VIEW VFatalEncountersDetails AS
+CREATE OR REPLACE VIEW VConfrontosFatais AS
 SELECT
   TO_DATE(
     f.year || '-' || LPAD(f.month::text, 2, '0') || '-' || LPAD(f.day::text, 2, '0'),
     'YYYY-MM-DD'
-  ) AS date_of_death,
+  ) AS data_morte,
 
-  COALESCE(dc.shortname, 'UNKNOWN') AS cause_of_death,
-  COALESCE(w.shortname, 'UNKNOWN') AS weapon_used, --victim weapon used
-  d.name AS police_department,
+  COALESCE(dc.shortname, 'DESCONHECIDA') AS causa_morte,
+  COALESCE(w.shortname, 'DESCONHECIDA') AS arma_usada, -- arma usada pela vítima
+  d.name AS departamento_policia,
 
-  f.threatLevel AS threat_status, -- possibles values: 'ATTACK', 'OTHER', 'UNKNOWN'
-  f.flee AS flee_status, -- possibles values 'VECHILE', 'FOOT', 'UNKNOWN', 'NOT FLEEING'
-  f.bodyCamera AS is_police_wearing_camera,
+  f.status_de_ameaca AS status_ameaca, -- possíveis valores: 'ATAQUE', 'OUTROS', 'DESCONHECIDO'
+  f.fuga AS status_fuga, -- possíveis valores: 'VEÍCULO', 'A PÉ', 'NÃO FUGIU', 'DESCONHECIDO'
+  f.camera_corporal AS policial_com_camera,
 
-  -- Dados da vítima (pessoa)
-  p.gender AS victim_gender, -- possibles values: 'MALE', 'FEMALE', 'UNKNOWN', 'OTHERS'
-  p.race AS victim_race, -- 'WHITE', 'BLACK', 'ASIAN', 'UNKNOWN', 'HISPANIC', 'OTHERS'
-  p.typePerson AS victim_type, -- 'POLICE', 'VICTIM', 'CRIMINAL'
-  p.rangeInf || ' - ' || p.rangeSup AS victim_age_range,
+  -- Dados da vítima
+  p.genero AS sexo_vitima, -- possíveis valores: 'MASCULINO', 'FEMININO', 'DESCONHECIDO', 'OUTROS'
+  p.raca AS raca_vitima,   -- possíveis valores: 'BRANCO', 'NEGRO', 'ASIÁTICO', 'HISPÂNICO', 'DESCONHECIDO', 'OUTROS'
+  p.tipo_pessoa AS tipo_vitima, -- valores possíveis: 'POLICIAL', 'VÍTIMA', 'CRIMINOSO'
+  p.faixa_inf || ' - ' || p.faixa_sup AS faixa_etaria_vitima,
 
-  l.state AS state, -- state of usa
-  l.city AS city, -- citys of usa
+  l.state AS estado, -- estado dos EUA
+  l.city AS cidade,  -- cidade dos EUA
   l.lat AS latitude, 
   l.long AS longitude
 
-FROM FFatalEncounters f
-JOIN DDeathCause dc ON f.idDeathCause = dc.id
-JOIN DWeapon w ON f.idWeapon = w.id
-JOIN DDept d ON f.idDept = d.id
-JOIN DPerson p ON f.idPerson = p.id AND f.idGroupAge = p.idGroupAge
-JOIN DLocal l ON f.idLocal = l.id;
+FROM FConfrontosFatais f
+JOIN DCausaMorte dc ON f.id_causa_morte = dc.id
+JOIN DArma w ON f.id_arma = w.id
+JOIN DDepartamento d ON f.id_departamento = d.id
+JOIN DPessoa p ON f.idPerson = p.id AND f.id_faixa_etaria = p.id_faixa_etaria
+JOIN DLocalidade l ON f.id_localidade = l.id;

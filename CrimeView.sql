@@ -1,26 +1,26 @@
-CREATE OR REPLACE VIEW VCrimeDetails AS
+CREATE OR REPLACE VIEW VCrime AS
 SELECT
   TO_DATE(
     f.year || '-' || LPAD(f.month::text, 2, '0') || '-' || LPAD(f.day::text, 2, '0'),
     'YYYY-MM-DD'
-  ) AS date_of_crime,
+  ) AS data_crime,
 
-  COALESCE(c.shortname, 'UNKNOWN') AS crime_name,
-  COALESCE(w.shortname, 'UNKNOWN') AS weapon_used, -- criminal weapon used
+  COALESCE(c.shortname, 'DESCONHECIDO') AS nome_crime,
+  COALESCE(w.shortname, 'DESCONHECIDA') AS arma_usada, -- arma usada no crime
 
-  -- Dados da pessoa criminal
-  p.gender AS criminal_gender, -- possibles values: 'MALE', 'FEMALE', 'UNKNOWN', 'OTHERS'
-  p.race AS criminal_race, -- possibles values: 'WHITE', 'BLACK', 'ASIAN', 'UNKNOWN', 'HISPANIC', 'OTHERS'
-  p.typePerson AS criminal_type, -- possibles values: 'CRIMINAL'
-  p.rangeInf || ' - ' || p.rangeSup AS criminal_age_range,
+  -- Dados da pessoa criminosa
+  p.genero AS sexo_criminoso, -- possíveis valores: 'MASCULINO', 'FEMININO', 'DESCONHECIDO', 'OUTROS'
+  p.raca AS raca_criminoso,   -- possíveis valores: 'BRANCO', 'NEGRO', 'ASIÁTICO', 'DESCONHECIDO', 'HISPÂNICO', 'OUTROS'
+  p.tipo_pessoa AS tipo_criminoso, -- possíveis valores: 'CRIMINOSO'
+  p.faixa_inf || ' - ' || p.faixa_sup AS faixa_etaria_criminoso,
 
-  l.state AS state, -- state of usa
-  l.city AS city, -- city of usa
+  l.state AS estado, -- estado dos EUA
+  l.city AS cidade,  -- cidade dos EUA
   l.lat AS latitude,
   l.long AS longitude
 
 FROM FCrime f
 JOIN DCrime c ON f.idCrime = c.id
-JOIN DWeapon w ON f.idWeapon = w.id
-JOIN DPerson p ON f.idPerson = p.id AND f.idGroupAge = p.idGroupAge
-JOIN DLocal l ON f.idLocal = l.id;
+JOIN DArma w ON f.id_arma = w.id
+JOIN DPessoa p ON f.idPerson = p.id AND f.id_faixa_etaria = p.id_faixa_etaria
+JOIN DLocalidade l ON f.id_localidade = l.id;

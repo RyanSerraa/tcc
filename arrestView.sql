@@ -1,28 +1,28 @@
-CREATE OR REPLACE VIEW VArrestDetails AS
+CREATE OR REPLACE VIEW VPrisao AS
 SELECT
   TO_DATE(
     f.year || '-' || LPAD(f.month::text, 2, '0') || '-' || LPAD(f.day::text, 2, '0'),
     'YYYY-MM-DD'
-  ) AS date_of_arrest,
+  ) AS data_prisao,
 
-  c.name AS crime_name,
-  d.name AS drug_name, -- possibles values: 'CONTROLLED SUBSTANCE', 'CRACK COCAINE', 'ECSTACY', 'GHB', 'HEROIN', 'HYDROCODONE', 'KETAMINE', 'MARIJUANA', 'METHAMPHETAMINE', 'OXYCODONE', 'PARAPHERNALIA', 'POWDER COCAINE'
-  COALESCE(w.shortname, 'UNKNOWN') AS weapon_used, -- weapon of arrest
+  c.name AS crime,  
+  d.name AS droga, -- possíveis valores: 'SUBSTÂNCIA CONTROLADA', 'CRACK', 'ECSTASY', 'GHB', 'HEROINA', 'HIDROCODONA', 'KETAMINA', 'MACONHA', 'METANFETAMINA', 'OXICODONA', 'PARAFERNÁLIA', 'COCAÍNA'
+  COALESCE(w.shortname, 'DESCONHECIDA') AS arma_usada, -- arma da prisão
 
-  -- Dados da pessoa criminal
-  p.gender AS criminal_gender, -- possibles values: 'MALE', 'FEMALE', 'UNKNOWN', 'OTHERS'
-  p.race AS criminal_race, -- possibles values: 'WHITE', 'BLACK', 'ASIAN', 'UNKNOWN', 'HISPANIC', 'OTHERS'
-  p.typePerson AS criminal_type, -- possibles values: 'CRIMINAL'
-  p.rangeInf || ' - ' || p.rangeSup AS criminal_age_range,
+  -- Dados da pessoa presa
+  p.genero AS sexo_criminoso, -- possíveis valores: 'MASCULINO', 'FEMININO', 'DESCONHECIDO', 'OUTROS'
+  p.raca AS raca_criminoso,   -- possíveis valores: 'BRANCO', 'NEGRO', 'ASIÁTICO', 'DESCONHECIDO', 'HISPÂNICO', 'OUTROS'
+  p.tipo_pessoa AS tipo_criminoso, -- possíveis valores: 'CRIMINOSO'
+  p.faixa_inf || ' - ' || p.faixa_sup AS faixa_etaria_criminoso,
 
-  l.state AS state, -- state of usa
-  l.city AS city, -- city of usa
+  l.state AS estado, -- estado dos EUA
+  l.city AS cidade,  -- cidade dos EUA
   l.lat AS latitude,
   l.long AS longitude
 
-FROM FArrest f
+FROM FPrisao f
 JOIN DCrime c ON f.idCrime = c.id
-JOIN DDrug d ON f.idDrug = d.id
-JOIN DWeapon w ON f.idWeapon = w.id
-JOIN DPerson p ON f.idPerson = p.id AND f.idGroupAge = p.idGroupAge
-JOIN DLocal l ON f.idLocal = l.id;
+JOIN DDroga d ON f.id_droga = d.id
+JOIN DArma w ON f.id_arma = w.id
+JOIN DPessoa p ON f.idPerson = p.id AND f.id_faixa_etaria = p.id_faixa_etaria
+JOIN DLocalidade l ON f.id_localidade = l.id;
