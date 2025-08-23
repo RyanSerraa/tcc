@@ -4,7 +4,7 @@ __pycache__/
 *.so
 *.pyd
 *.pyo
-
+*.csv
 # Virtual environments
 .env/
 .venv/
