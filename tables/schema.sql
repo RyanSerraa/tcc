@@ -70,7 +70,19 @@ ALTER TABLE FCrime RENAME COLUMN idGroupAge TO id_faixa_etaria;
 ALTER TABLE FCrime RENAME COLUMN idLocal TO id_localidade;
 ALTER TABLE FCrime RENAME COLUMN idWeapon TO id_arma;
 
+ALTER TABLE DCausaMorte RENAME COLUMN description TO descricao;
 
+-- Renomeando colunas de DDepartamento
+ALTER TABLE DDepartamento RENAME COLUMN name TO nome;
+
+-- Renomeando colunas de DArma
+ALTER TABLE DArma RENAME COLUMN name TO nome;
+
+-- Renomeando colunas de DCrime
+ALTER TABLE DCrime RENAME COLUMN name TO nome;
+
+-- Renomeando colunas de DDroga
+ALTER TABLE DDroga RENAME COLUMN name TO nome;
 --- Renomeiando os values do enum 
 -- ENUM raça
 ALTER TYPE raca_enum RENAME VALUE 'WHITE' TO 'BRANCO';
