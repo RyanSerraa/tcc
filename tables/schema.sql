@@ -29,12 +29,16 @@ ALTER TABLE DLocalidade RENAME COLUMN standardDeviationBlack TO desvio_padrao_ne
 ALTER TABLE DLocalidade RENAME COLUMN standardDeviationWhite TO desvio_padrao_brancos;
 ALTER TABLE DLocalidade RENAME COLUMN standardDeviationHispanic TO desvio_padrao_hispanicos;
 ALTER TABLE DLocalidade RENAME COLUMN standardDeviationAsian TO desvio_padrao_asiaticos;
+ALTER TABLE DLocalidade RENAME COLUMN city TO cidade;
+ALTER TABLE DLocalidade RENAME COLUMN state TO estado; 
 
 -- Renomeando colunas de DPessoa
 ALTER TABLE DPessoa RENAME COLUMN idGroupAge TO id_faixa_etaria;
 ALTER TABLE DPessoa RENAME COLUMN typePerson TO tipo_pessoa;
 ALTER TABLE DPessoa RENAME COLUMN rangeInf TO faixa_inf;
 ALTER TABLE DPessoa RENAME COLUMN rangeSup TO faixa_sup;
+ALTER TABLE DPessoa RENAME COLUMN gender TO genero;
+ALTER TABLE DPessoa RENAME COLUMN race TO raca;
 
 -- Renomeando colunas em FMortePolicial
 ALTER TABLE FMortePolicial RENAME COLUMN idGroupAge TO id_faixa_etaria;
@@ -77,10 +81,11 @@ ALTER TABLE DDepartamento RENAME COLUMN name TO nome;
 
 -- Renomeando colunas de DArma
 ALTER TABLE DArma RENAME COLUMN name TO nome;
+alter table darma rename column shortname to nome_abreviado;
 
 -- Renomeando colunas de DCrime
 ALTER TABLE DCrime RENAME COLUMN name TO nome;
-
+alter table dcrime rename column shortname to nome_abreviado;
 -- Renomeando colunas de DDroga
 ALTER TABLE DDroga RENAME COLUMN name TO nome;
 --- Renomeiando os values do enum 

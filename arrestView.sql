@@ -1,13 +1,10 @@
 CREATE OR REPLACE VIEW VPrisao AS
 SELECT
-  TO_DATE(
-    f.year || '-' || LPAD(f.month::text, 2, '0') || '-' || LPAD(f.day::text, 2, '0'),
-    'YYYY-MM-DD'
-  ) AS data_prisao,
-
-  c.name AS crime,  
-  d.name AS droga, -- possíveis valores: 'SUBSTÂNCIA CONTROLADA', 'CRACK', 'ECSTASY', 'GHB', 'HEROINA', 'HIDROCODONA', 'KETAMINA', 'MACONHA', 'METANFETAMINA', 'OXICODONA', 'PARAFERNÁLIA', 'COCAÍNA'
-  COALESCE(w.shortname, 'DESCONHECIDA') AS arma_usada, -- arma da prisão
+  MAKE_DATE(f.ano, f.mes, f.dia) AS data_crime,
+  
+  d.nome AS droga, -- possíveis valores: 'SUBSTÂNCIA CONTROLADA', 'CRACK', 'ECSTASY', 'GHB', 'HEROINA', 'HIDROCODONA', 'KETAMINA', 'MACONHA', 'METANFETAMINA', 'OXICODONA', 'PARAFERNÁLIA', 'COCAÍNA'
+  COALESCE(c.nome_abreviado, 'DESCONHECIDO') AS nome_crime,
+  COALESCE(a.nome_abreviado, 'DESCONHECIDA') AS arma_usada, -- arma usada no crime
 
   -- Dados da pessoa presa
   p.genero AS sexo_criminoso, -- possíveis valores: 'MASCULINO', 'FEMININO', 'DESCONHECIDO', 'OUTROS'
@@ -15,14 +12,14 @@ SELECT
   p.tipo_pessoa AS tipo_criminoso, -- possíveis valores: 'CRIMINOSO'
   p.faixa_inf || ' - ' || p.faixa_sup AS faixa_etaria_criminoso,
 
-  l.state AS estado, -- estado dos EUA
-  l.city AS cidade,  -- cidade dos EUA
-  l.lat AS latitude,
-  l.long AS longitude
+  l.estado AS estado, -- estado dos EUA
+  l.cidade AS cidade,  -- cidade dos EUA
+  l.latitude AS latitude,
+  l.longitude AS longitude
 
-FROM FPrisao f
-JOIN DCrime c ON f.idCrime = c.id
+FROM fprisao f
+JOIN DCrime c ON f.id_crime = c.id
 JOIN DDroga d ON f.id_droga = d.id
-JOIN DArma w ON f.id_arma = w.id
-JOIN DPessoa p ON f.idPerson = p.id AND f.id_faixa_etaria = p.id_faixa_etaria
+JOIN DArma a ON f.id_arma = a.id
+JOIN DPessoa p ON f.id_pessoa = p.id AND f.id_faixa_etaria = p.id_faixa_etaria
 JOIN DLocalidade l ON f.id_localidade = l.id;
