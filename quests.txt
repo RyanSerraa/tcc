@@ -1,0 +1,285 @@
+VCrime
+
+USER QUESTION:
+Qual a quantidade total de crimes do tipo 'ROUBO' em cada estado, no ano de 2022?
+
+SQL QUERY:
+SELECT estado, COUNT(*) AS total_crimes
+FROM VCrime
+WHERE nome_crime = 'ROUBO' AND EXTRACT(YEAR FROM data_crime) = 2022
+GROUP BY estado
+ORDER BY total_crimes DESC;
+
+USER QUESTION:
+Liste os 10 crimes mais comuns cometidos por pessoas do sexo 'FEMININO' com a raça 'BRANCO' nos últimos 5 anos.
+
+SQL QUERY:
+SELECT nome_crime, COUNT(*) AS quantidade
+FROM VCrime
+WHERE sexo_criminoso = 'FEMININO' AND raca_criminoso = 'BRANCO' AND data_crime >= CURRENT_DATE - INTERVAL '5 years'
+GROUP BY nome_crime
+ORDER BY quantidade DESC
+LIMIT 10;
+
+USER QUESTION:
+Quais são os 5 tipos de crimes mais comuns que aconteceram em Los Angeles e Nova York no ano de 2021?
+
+SQL QUERY:
+SELECT nome_crime, COUNT(*) AS quantidade
+FROM VCrime
+WHERE (cidade = 'LOS ANGELES' OR cidade = 'NEW YORK') AND EXTRACT(YEAR FROM data_crime) = 2021
+GROUP BY nome_crime
+ORDER BY quantidade DESC
+LIMIT 5;
+
+USER QUESTION:
+Liste a contagem de crimes em que a arma usada foi 'FACA' ou 'PISTOLA', agrupado por faixa etária do criminoso.
+
+SQL QUERY:
+SELECT faixa_etaria_criminoso, COUNT(*) AS total_crimes
+FROM VCrime
+WHERE arma_usada IN ('FACA', 'PISTOLA')
+GROUP BY faixa_etaria_criminoso
+ORDER BY total_crimes DESC
+LIMIT 20;
+
+USER QUESTION:
+Qual a proporção de crimes cometidos por pessoas do sexo 'MASCULINO' versus 'FEMININO' no estado da Flórida?
+
+SQL QUERY:
+SELECT
+    sexo_criminoso,
+    COUNT(*) AS total_crimes,
+    CAST(COUNT(*) AS DECIMAL) * 100 / (SELECT COUNT(*) FROM VCrime WHERE estado = 'FLÓRIDA') AS porcentagem
+FROM VCrime
+WHERE estado = 'FLÓRIDA'
+GROUP BY sexo_criminoso
+ORDER BY total_crimes DESC;
+
+-------------
+VMortePolicial
+
+USER QUESTION:
+Em quais cidades ocorreram mais mortes de policiais por 'TIROTEIO' desde o ano de 2020?
+
+SQL QUERY:
+SELECT cidade, COUNT(*) AS total_mortes
+FROM VMortePolicial
+WHERE causa_morte = 'TIROTEIO' AND EXTRACT(YEAR FROM data_crime) >= 2020
+GROUP BY cidade
+ORDER BY total_mortes DESC
+LIMIT 20;
+
+USER QUESTION:
+Qual a média de idade dos policiais que morreram em serviço, por estado?
+
+SQL QUERY:
+SELECT estado, AVG(faixa_etaria_criminoso) AS media_idade
+FROM VMortePolicial
+GROUP BY estado
+ORDER BY media_idade DESC
+LIMIT 20;
+
+USER QUESTION:
+Mostre a média da faixa etária de policiais que morreram por 'ATAQUE CARDÍACO' no estado de 'TEXAS'.
+
+SQL QUERY:
+SELECT AVG(CAST(SUBSTRING(faixa_etaria_criminoso FROM POSITION('-' IN faixa_etaria_criminoso) + 2 FOR LENGTH(faixa_etaria_criminoso)) AS INTEGER)) AS media_idade
+FROM VMortePolicial
+WHERE estado = 'TEXAS' AND causa_morte = 'ATAQUE CARDÍACO'
+LIMIT 20;
+
+USER QUESTION:
+Quais são os estados onde ocorreram mais de 10 mortes de policiais em 2023?
+
+SQL QUERY:
+SELECT estado, COUNT(*) AS total_mortes
+FROM VMortePolicial
+WHERE EXTRACT(YEAR FROM data_crime) = 2023
+GROUP BY estado
+HAVING COUNT(*) > 10
+ORDER BY total_mortes DESC;
+
+USER QUESTION:
+Liste todas as mortes de policiais que aconteceram em 'JANEIRO' e 'FEVEREIRO' no estado de 'CALIFÓRNIA' durante os últimos 3 anos.
+
+SQL QUERY:
+SELECT *
+FROM VMortePolicial
+WHERE estado = 'CALIFÓRNIA' AND EXTRACT(MONTH FROM data_crime) IN (1, 2) AND EXTRACT(YEAR FROM data_crime) >= EXTRACT(YEAR FROM CURRENT_DATE) - 3
+LIMIT 20;
+
+-----------
+VConfrontosFatais
+
+USER QUESTION:
+Quantos confrontos fatais aconteceram por mês em 2023, com o status de fuga 'A PÉ' e a vítima sendo do sexo 'MASCULINO'?
+
+SQL QUERY:
+SELECT EXTRACT(MONTH FROM data_crime) AS mes, COUNT(*) AS total_confrontos
+FROM VConfrontosFatais
+WHERE EXTRACT(YEAR FROM data_crime) = 2023 AND status_fuga = 'A PÉ' AND sexo_vitima = 'MASCULINO'
+GROUP BY mes
+ORDER BY mes;
+
+USER QUESTION:
+Liste os 5 departamentos de polícia com o maior número de confrontos fatais onde a arma usada foi uma 'PISTOLA'.
+
+SQL QUERY:
+SELECT departamento_policia, COUNT(*) AS total_confrontos
+FROM VConfrontosFatais
+WHERE arma_usada = 'PISTOLA'
+GROUP BY departamento_policia
+ORDER BY total_confrontos DESC
+LIMIT 5;
+
+USER QUESTION:
+Qual a porcentagem de confrontos fatais em que a vítima fugiu 'A PÉ' versus 'DE VEÍCULO', por departamento de polícia?
+
+SQL QUERY:
+SELECT
+    departamento_policia,
+    SUM(CASE WHEN status_fuga = 'A PÉ' THEN 1 ELSE 0 END) AS fuga_a_pe,
+    SUM(CASE WHEN status_fuga = 'VEÍCULO' THEN 1 ELSE 0 END) AS fuga_veiculo,
+    CAST(SUM(CASE WHEN status_fuga = 'A PÉ' THEN 1 ELSE 0 END) AS DECIMAL) * 100 / COUNT(*) AS porcentagem_fuga_a_pe,
+    CAST(SUM(CASE WHEN status_fuga = 'VEÍCULO' THEN 1 ELSE 0 END) AS DECIMAL) * 100 / COUNT(*) AS porcentagem_fuga_veiculo
+FROM VConfrontosFatais
+WHERE status_fuga IN ('A PÉ', 'VEÍCULO')
+GROUP BY departamento_policia
+ORDER BY departamento_policia
+LIMIT 20;
+
+USER QUESTION:
+Qual a média de confrontos fatais por ano que aconteceram em 'WASHINGTON', 'D.C.'?
+
+SQL QUERY:
+SELECT
+    EXTRACT(YEAR FROM data_crime) AS ano,
+    COUNT(*) AS total_confrontos
+FROM VConfrontosFatais
+WHERE cidade = 'WASHINGTON' AND estado = 'D.C.'
+GROUP BY ano
+ORDER BY ano
+LIMIT 20;
+
+USER QUESTION:
+Liste a quantidade de confrontos fatais por 'faixa etária da vítima', onde o status de ameaça foi 'ATAQUE' e a vítima era da raça 'NEGRO'.
+
+SQL QUERY:
+SELECT faixa_etaria_criminoso, COUNT(*) AS total_confrontos
+FROM VConfrontosFatais
+WHERE status_ameaca = 'ATAQUE' AND raca_vitima = 'NEGRO'
+GROUP BY faixa_etaria_criminoso
+ORDER BY total_confrontos DESC
+LIMIT 20;
+
+------------
+VTiroteio
+
+USER QUESTION:
+Mostre a quantidade de tiroteios por mês no ano de 2024, em que a vítima tinha a raça 'NEGRO'.
+
+SQL QUERY:
+SELECT EXTRACT(MONTH FROM data_crime) AS mes, COUNT(*) AS total_tiroteios
+FROM VTiroteio
+WHERE EXTRACT(YEAR FROM data_crime) = 2024 AND raca_vitima = 'NEGRO'
+GROUP BY mes
+ORDER BY mes;
+
+USER QUESTION:
+Em quais estados ocorreram tiroteios com status de ameaça 'ATAQUE' e a arma usada foi um 'RIFLE'?
+
+SQL QUERY:
+SELECT DISTINCT estado
+FROM VTiroteio
+WHERE status_ameaca = 'ATAQUE' AND arma_usada = 'RIFLE'
+ORDER BY estado
+LIMIT 20;
+
+USER QUESTION:
+Mostre a contagem de tiroteios por mês em 2023, onde o policial estava com câmera corporal e a vítima era do sexo 'FEMININO'.
+
+SQL QUERY:
+SELECT EXTRACT(MONTH FROM data_crime) AS mes, COUNT(*) AS total_tiroteios
+FROM VTiroteio
+WHERE EXTRACT(YEAR FROM data_crime) = 2023 AND policial_com_camera = 'SIM' AND sexo_vitima = 'FEMININO'
+GROUP BY mes
+ORDER BY mes;
+
+USER QUESTION:
+Em quais estados ocorreram tiroteios onde a fuga foi 'NÃO FUGIU' e a causa da morte foi 'TIROTEIO' durante os anos de 2022 e 2023?
+
+SQL QUERY:
+SELECT DISTINCT estado
+FROM VTiroteio
+WHERE status_fuga = 'NÃO FUGIU' AND causa_morte = 'TIROTEIO' AND EXTRACT(YEAR FROM data_crime) IN (2022, 2023)
+ORDER BY estado
+LIMIT 20;
+
+USER QUESTION:
+Qual a distribuição de raça das vítimas de tiroteio que estavam com status de ameaça 'OUTROS'?
+
+SQL QUERY:
+SELECT raca_vitima, COUNT(*) AS total_ocorrencias, CAST(COUNT(*) AS DECIMAL) * 100 / (SELECT COUNT(*) FROM VTiroteio WHERE status_ameaca = 'OUTROS') AS porcentagem
+FROM VTiroteio
+WHERE status_ameaca = 'OUTROS'
+GROUP BY raca_vitima
+ORDER BY total_ocorrencias DESC
+LIMIT 20;
+
+---------------------
+VPrisao
+
+USER QUESTION:
+Qual a quantidade de prisões por tipo de droga no estado da Califórnia ('CA'), ordenado do maior para o menor?
+
+SQL QUERY:
+SELECT droga, COUNT(*) AS total_prisoes
+FROM VPrisao
+WHERE estado = 'CA' AND tipo_criminoso = 'CRIMINOSO'
+GROUP BY droga
+ORDER BY total_prisoes DESC
+LIMIT 20;
+
+USER QUESTION:
+Liste os 15 crimes mais comuns que resultaram em prisão, cometidos por pessoas do sexo 'MASCULINO' e de raça 'HISPÂNICO' que usaram a arma 'PISTOLA'.
+
+SQL QUERY:
+SELECT nome_crime, COUNT(*) AS total_prisoes
+FROM VPrisao
+WHERE sexo_criminoso = 'MASCULINO' AND raca_criminoso = 'HISPÂNICO' AND arma_usada = 'PISTOLA'
+GROUP BY nome_crime
+ORDER BY total_prisoes DESC
+LIMIT 15;
+
+USER QUESTION:
+Qual a quantidade de prisões por 'CRACK' em cada cidade no estado de 'NEBRASKA'?
+
+SQL QUERY:
+SELECT cidade, COUNT(*) AS total_prisoes
+FROM VPrisao
+WHERE estado = 'NEBRASKA' AND droga = 'CRACK'
+GROUP BY cidade
+ORDER BY total_prisoes DESC
+LIMIT 20;
+
+USER QUESTION:
+Mostre os crimes mais comuns que resultaram em prisão para cada faixa etária de criminoso.
+
+SQL QUERY:
+SELECT
+    faixa_etaria_criminoso,
+    nome_crime,
+    COUNT(*) AS total_prisoes
+FROM VPrisao
+GROUP BY faixa_etaria_criminoso, nome_crime
+ORDER BY faixa_etaria_criminoso, total_prisoes DESC
+LIMIT 20;
+
+USER QUESTION:
+Quantas prisões por posse de 'MACONHA' aconteceram nos últimos 12 meses?
+
+SQL QUERY:
+SELECT COUNT(*)
+FROM VPrisao
+WHERE droga = 'MACONHA' AND data_crime >= CURRENT_DATE - INTERVAL '12 months';
