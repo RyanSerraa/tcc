@@ -8,10 +8,14 @@ from openai import OpenAI
 from dotenv import load_dotenv
 from typing_extensions import TypedDict
 from langgraph.graph import StateGraph, START, END
+from psycopg2.extras import DictCursor, Json
+from langchain_huggingface import HuggingFaceEmbeddings
 
 
 df = pd.read_csv("depts.csv", header=None)
 departamentos_set = set(df[0].str.lower())
+
+embeddings_model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
 
 # Graph state
@@ -77,23 +81,59 @@ supervisor_model = load_agent(
 )
 
 
+def getContext(question: str, agente: str) -> str:
+    conn = get_connection()
+    cursor = conn.cursor(cursor_factory=DictCursor)
+    query_emb = embeddings_model.embed_query(question)
+    query_emb_vector = Json(query_emb)
+    resultados = []
+    cursor.execute(
+        """
+        SELECT pergunta, resposta
+        FROM rag_documentos
+        WHERE agente = %s
+        ORDER BY embedding_pergunta <-> %s::vector
+        LIMIT 3
+        """,
+        (
+            agente,
+            query_emb_vector,
+        ),
+    )
+    print("consultando o banco de dados...")
+    resultados = cursor.fetchall()
+    conn.close()
+
+    contexto = "\n".join(
+        [
+            f"{i+1}. Pergunta: {r['pergunta']}\n   Resposta: {r['resposta']}"
+            for i, r in enumerate(resultados)
+        ]
+    )
+    return contexto
+
+
 def choose_chain(state: State):
     print("Escolhendo a cadeia...")
     question = state["question"].lower()
     hasFoundDept = any(dep.lower() in question for dep in departamentos_set)
-
+    contexto = getContext(state["question"], "supervisor")
     prompt = (
-        f"{prompt_supervisor}\n"
-        f'Analise a seguinte pergunta: "{question}".\n'
+        f"Contexto relevante:\n{contexto}\n"
+        f'Pergunta do usuário: "{state["question"]}".\n'
         f"temDepartamentoEncontrado: {hasFoundDept}"
     )
+    print("Prompt - Supervisor:", prompt)
     response = supervisor_model.chat.completions.create(
         model="n/a",
         messages=[{"role": "user", "content": prompt}],
-        max_tokens=512,
-        temperature=0,
+        extra_body={"include_retrieval_info": True},
     )
-    if response.choices[0].message.content.strip().lower() == "sim":
+    print("response - Supervisor:", response.choices[0].message.content)
+    resposta_texto = (
+        response.choices[0].message.content.strip() if response.choices else ""
+    )
+    if resposta_texto.lower() == "sim":
         return {"isEUA": True}
     return {"isEUA": False}
 
@@ -104,16 +144,21 @@ def verifySupervisorAnswer(state: State):
     return "No"
 
 
+def hasChart(state: State):
+    if "gráfico" in state["question"]:
+        return "Yes"
+    return "No"
+
+
 def searchWeb(state: State):
     print("Buscando na web...")
-    prompt = f"{prompt_webSearch}\n\n" f"pergunta: \"{state['question']}\".\n"
+    prompt = f"Pergunta: \"{state['question']}\"."
     response = webSearch_model.chat.completions.create(
         model="n/a",
         messages=[{"role": "user", "content": prompt}],
-        max_tokens=512,
-        temperature=0,
+        extra_body={"include_retrieval_info": True},
     )
-    print("response:", response)
+    print("response - searchWeb:", response.choices[0].message.content)
     answer = response.choices[0].message.content.strip() if response.choices else ""
     return {"answer": answer}
 
@@ -130,97 +175,73 @@ def clean_text(text: str) -> str:
 
 def to_sql_query(state: State):
     print("Convertendo para SQL...")
-    final_prompt = f"{prompt_text_to_sql}\n\nQUESTION:\n{state['question']}\n\nSQL:"
+    cleanedQuestion = state["question"].replace(" em gráfico", "")
+    contexto = getContext(state["question"], "text_to_sql")
+    print("Contexto:", contexto)
+    final_prompt = (
+        f"Pergunta do usuario:\n{cleanedQuestion}\n\nContexto relevante:\n{contexto}"
+    )
     response = text_to_sql.chat.completions.create(
-        model="n/a",  # ou outro modelo se você tiver
+        model="n/a",
         messages=[{"role": "user", "content": final_prompt}],
         extra_body={"include_retrieval_info": True},
-        max_tokens=512,
-        temperature=0,
     )
     content = ""
     for choice in response.choices:
         content += choice.message.content
 
     cleanedQuery = clean_text(content)
+    print("Generated SQL Query:", cleanedQuery)
     return {"query": cleanedQuery}
 
 
-def run_query(sql_query: State):
-    print("Executando consulta SQL...")
-    return {
-        "result": {
-            "State": "California",
-            "qtd_white_deaths": 80000,
-            "qtd_asian_deaths": 65000,
-        }
-    }
-    # conn = get_connection()
-    # print("Conexão estabelecida")
-    # try:
-    #     with conn.cursor() as cursor:
-    #         cursor.execute(sql_query["query"])
-    #         print("Consulta executada")
-    #         if sql_query["query"].strip().lower().startswith("select"):
-    #             chunk_size = 1000
-    #             data = []
-    #             while True:
-    #                 rows = cursor.fetchmany(chunk_size)
-    #                 if not rows:
-    #                     break
-    #                 data.extend(rows)
-    #             columns = [desc[0] for desc in cursor.description]
-    #             return {"result": pd.DataFrame(data, columns=columns)}
-    #         else:
-    #             conn.commit()
-    #             return {"result": f"{cursor.rowcount} linhas afetadas"}
-    # finally:
-    #     conn.close()
+def run_query(sql_query: dict):
+    conn = get_connection()
+    try:
+        with conn.cursor(cursor_factory=DictCursor) as cursor:
+            query = sql_query["query"].strip()
+            cursor.execute(query)
+
+            if query.lower().startswith("select"):
+                rows = cursor.fetchall()
+                result = [dict(row) for row in rows]  # Converte para lista de dicts
+                return {"result": result}
+            else:
+                conn.commit()
+                return {"affected_rows": cursor.rowcount}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+    finally:
+        conn.close()
 
 
 def respondWithChart(state: State):
     print("Gerando gráfico...")
-    prompt = (
-        f"{prompt_chartEditor}\n\n"
-        f"Analise a seguinte pergunta: \"{state['question']}\".\n"
-        f"Analise esses dados: \"{state['result']}\".\n"
-        "Crie um gráfico ou tabela que represente visualmente os dados fornecidos.\n"
-        "Retorne a imagem do gráfico em base64 PNG, apenas o base64, sem texto adicional."
-    )
+    prompt = f"Pergunta: \"{state['question']}\".\n" f"Dados: \"{state['result']}\".\n"
 
     # Geração da imagem via modelo
     response = chartEditor_model.chat.completions.create(
         model="n/a",
         messages=[{"role": "user", "content": prompt}],
-        max_tokens=2048,
-        temperature=0,
+        extra_body={"include_retrieval_info": True},
     )
-
-    raw_output = response.choices[0].message["content"].strip()
-
-    try:
-        image_bytes = base64.b64decode(raw_output)
-    except Exception as e:
-        raise ValueError(
-            f"Erro ao decodificar imagem: {e}\nSaída do modelo: {raw_output}"
-        )
-
-    return {"answer": image_bytes}
+    print("response - respondWithChart:", response.choices[0].message.content)
+    if response.choices and hasattr(response.choices[0].message, "content"):
+        answer = response.choices[0].message.content.strip()
+    else:
+        answer = ""
+    return {"answer": answer}
 
 
 def respondWithText(state: State):
     print("Gerando resposta textual...")
-    prompt = (
-        f"{prompt_textEditor}\n\n"
-        f"pergunta: \"{state['question']}\".\n"
-        f"resposta: \"{state['result']}\".\n"
-    )
+    prompt = f"Pergunta: \"{state['question']}\".\n" f"Dados: \"{state['result']}\".\n"
     response = textEditor_model.chat.completions.create(
         model="n/a",
         messages=[{"role": "user", "content": prompt}],
-        max_tokens=512,
-        temperature=0,
+        extra_body={"include_retrieval_info": True},
     )
+    print("response - respondWithText:", response.choices[0].message.content)
     if response.choices and hasattr(response.choices[0].message, "content"):
         answer = response.choices[0].message.content.strip()
     else:
@@ -234,7 +255,7 @@ workflow.add_node("choose_chain", choose_chain)
 workflow.add_node("searchWeb", searchWeb)
 workflow.add_node("to_sql_query", to_sql_query)
 workflow.add_node("run_query", run_query)
-# workflow.add_node("respondWithChart", respondWithChart)
+workflow.add_node("respondWithChart", respondWithChart)
 workflow.add_node("respondWithText", respondWithText)
 
 workflow.add_edge(START, "choose_chain")
@@ -242,8 +263,11 @@ workflow.add_conditional_edges(
     "choose_chain", verifySupervisorAnswer, {"Yes": "to_sql_query", "No": "searchWeb"}
 )
 workflow.add_edge("to_sql_query", "run_query")
-workflow.add_edge("run_query", "respondWithText")
+workflow.add_conditional_edges(
+    "run_query", hasChart, {"Yes": "respondWithChart", "No": "respondWithText"}
+)
 workflow.add_edge("respondWithText", END)
+workflow.add_edge("respondWithChart", END)
 workflow.add_edge("searchWeb", END)
 
 chain = workflow.compile()
@@ -457,15 +481,15 @@ st.markdown(
 st.markdown(
     """
     <div class="header-title">
-        <h1>Text-to-SQL Converter</h1>
-        <p>Transforme suas perguntas em consultas SQL profissionais</p>
+        <h1>Crime Flow</h1>
+        <p>Descubra padrões e estatísticas sobre violência nos EUA.</p>
     </div>
 """,
     unsafe_allow_html=True,
 )
 
 # Seção de cards de recursos
-st.markdown("### Principais Recursos")
+st.markdown("### Principais Painéis Interativos")
 col1, col2, col3, col4, col5 = st.columns(5)
 
 with col1:
@@ -474,7 +498,7 @@ with col1:
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
         <a href="http://161.35.61.141:3000/public/dashboard/95ac4087-b5b8-45af-9a87-668741ffa295" class="card" style="display: block; text-decoration: none;">
             <div class="card-icon"><i class="fas fa-handcuffs card-icon"></i></div>
-            <h3>Arrests</h3>
+            <h3>Prisões</h3>
             <p>Visualize dados detalhados de prisões com análises temporais e geográficas</p>
         </a>
         """,
@@ -498,8 +522,8 @@ with col3:
         """
         <a href="http://161.35.61.141:3000/public/dashboard/7c38c974-4ee2-43df-895c-d44bbd701ed9" class="card" style="display: block; text-decoration: none;">
             <div class="card-icon"><i class="fas fa-skull card-icon"></i></div>
-            <h3>Fatal Encounters</h3>
-            <p>Casos com resultados fatais e análises de circunstâncias</p>
+            <h3>Confrontos Fatais</h3>
+            <p>Casos sobre confrontos fatais e análises de circunstâncias</p>
         </a>
         """,
         unsafe_allow_html=True,
@@ -510,7 +534,7 @@ with col4:
         """
         <a href="http://161.35.61.141:3000/public/dashboard/a81a61ba-5c63-4e3f-b6a0-e3efba33feae" class="card" style="display: block; text-decoration: none;">
             <div class="card-icon"><i class="fas fa-heart-broken card-icon"></i></div>
-            <h3>Police Deaths</h3>
+            <h3>Óbitos Policiais</h3>
             <p>Óbitos policiais registrados com análises de causas e prevenção</p>
         </a>
         """,
@@ -522,7 +546,7 @@ with col5:
         """
         <a href="http://161.35.61.141:3000/public/dashboard/18d44459-68c1-4f5a-af24-0a05711bdc62" class="card" style="display: block; text-decoration: none;">
             <div class="card-icon"><i class="fas fa-crosshairs card-icon"></i></div>
-            <h3>Shootings</h3>
+            <h3>Tiroteios</h3>
             <p>Incidentes com arma de fogo e estatísticas de ocorrências</p>
         </a>
         """,
@@ -548,7 +572,7 @@ with col_left:
 
         <div class="feature-card">
             <h4>Exemplo de consulta</h4>
-            <p>"Liste todos os clientes ativos que compraram mais de 3 produtos no último mês"</p>
+            <p>"Qual é a principal causa de morte na Califórnia em confrontos fatais?"</p>
         </div>
     """,
         unsafe_allow_html=True,
@@ -558,7 +582,7 @@ with col_right:
     st.markdown(
         """
         <div class="info-box">
-            💡 Descreva em linguagem natural quais dados você precisa do banco de dados.
+            💡 Descreva em linguagem natural quais dados que você precisa sobre violência nos EUA.
         </div>
     """,
         unsafe_allow_html=True,
@@ -566,7 +590,7 @@ with col_right:
 
     query = st.text_area(
         "Descreva sua necessidade de dados:",
-        placeholder="Ex: Obter todos os clientes que fizeram compras acima de R$1000 no último mês, ordenados por valor decrescente",
+        placeholder="Ex: Qual é a principal causa de morte na Califórnia em confrontos fatais?",
         label_visibility="collapsed",
     )
 
