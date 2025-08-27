@@ -1,7 +1,11 @@
 streamlit
-langchain_core
-langchain_community
-langchain_ollama
-SQLAlchemy
+langchain-core
+langchain-community
 psycopg2-binary
 python-dotenv
+pandas
+openai
+typing-extensions
+langgraph
+sentence-transformers
+langchain-huggingface

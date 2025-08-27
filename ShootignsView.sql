@@ -1,6 +1,7 @@
 CREATE OR REPLACE VIEW VTiroteio AS
 SELECT
-  MAKE_DATE(f.ano, f.mes, f.dia) AS data_crime,
+  MAKE_DATE(f.ano, f.mes, f.dia) AS data_morte,
+
 
   COALESCE(c.nome_abreviado, 'DESCONHECIDO') AS causa_morte,
   COALESCE(a.nome_abreviado, 'DESCONHECIDA') AS arma_usada, -- arma usada no crime
@@ -13,7 +14,7 @@ SELECT
   p.genero AS sexo_vitima, -- possíveis valores: 'MASCULINO', 'FEMININO', 'DESCONHECIDO', 'OUTROS'
   p.raca AS raca_vitima,   -- possíveis valores: 'BRANCO', 'NEGRO', 'ASIÁTICO', 'DESCONHECIDO', 'HISPÂNICO', 'OUTROS'
   p.tipo_pessoa AS tipo_vitima, -- possíveis valores: 'VITIMA'
-  p.faixa_inf || ' - ' || p.faixa_sup AS faixa_etaria_criminoso,
+  p.faixa_inf || ' - ' || p.faixa_sup AS faixa_etaria_vitima,
 
   l.estado AS estado, -- estado dos EUA
   l.cidade AS cidade,  -- cidade dos EUA
