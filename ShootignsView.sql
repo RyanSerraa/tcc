@@ -2,6 +2,7 @@ CREATE OR REPLACE VIEW VTiroteio AS
 SELECT
   MAKE_DATE(f.ano, f.mes, f.dia) AS data_morte,
 
+
   COALESCE(c.nome_abreviado, 'DESCONHECIDO') AS causa_morte,
   COALESCE(a.nome_abreviado, 'DESCONHECIDA') AS arma_usada, -- arma usada no crime
 
