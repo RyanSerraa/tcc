@@ -1,0 +1,60 @@
+Views e colunas
+
+View: VPrisao
+ - data_prisao: DATE (data da prisão)
+ - crime: VARCHAR(255) (nome do crime)
+ - droga: VARCHAR(255) (nome da droga) Possíveis valores: 'SUBSTÂNCIA CONTROLADA', 'CRACK', 'ECSTASY', 'GHB', 'HEROINA', 'HIDROCODONA', 'KETAMINA', 'MACONHA', 'METANFETAMINA', 'OXICODONA', 'PARAFERNÁLIA', 'COCAÍNA'
+ - arma_usada: VARCHAR(255) (arma usada na prisão) Valor padrão quando não informada: 'DESCONHECIDA'
+ - sexo_criminoso: genero_enum Possíveis valores: 'MASCULINO', 'FEMININO', 'DESCONHECIDO', 'OUTROS'
+ - raca_criminoso: raca_enum Possíveis valores: 'BRANCO', 'NEGRO', 'ASIÁTICO', 'DESCONHECIDO', 'HISPÂNICO', 'OUTROS'
+ - tipo_criminoso: tipo_de_pessoa_enum Possível valor: 'CRIMINOSO'
+ - faixa_etaria_criminoso: TEXT (ex.: 18 - 24)
+ - estado: VARCHAR(255) (estado dos EUA)
+ - cidade: VARCHAR(255)
+ - latitude: DECIMAL
+ - longitude: DECIMAL
+
+View: VCrime
+ - data_crime: DATE
+ - nome_crime: VARCHAR(255) (nome abreviado do crime, ou 'DESCONHECIDO')
+ - arma_usada: VARCHAR(255) (arma usada pelo criminoso, ou 'DESCONHECIDA')
+ - sexo_criminoso: genero_enum (mesmos valores da VPrisao)
+ - raca_criminoso: raca_enum (mesmos valores da VPrisao)
+ - tipo_criminoso: tipo_de_pessoa_enum (valor: 'CRIMINOSO')
+ - faixa_etaria_criminoso: TEXT
+ - estado, cidade, latitude, longitude: mesma definição da VPrisao
+
+View: VMortePolicial
+ - data_morte: DATE
+ - causa_morte: VARCHAR(255)
+ - departamento_policia: VARCHAR(255)
+ - tipo_policia: tipo_de_pessoa_enum (valor: 'POLICIAL')
+ - estado, cidade, latitude, longitude: idem acima
+
+View: VConfrontosFatais
+ - data_morte: DATE
+ - causa_morte: VARCHAR(255) (ou 'DESCONHECIDA')
+ - arma_usada: VARCHAR(255) (arma usada pela vítima, ou 'DESCONHECIDA')
+ - departamento_policia: VARCHAR(255)
+ - status_ameaca: ameaca_enum Possíveis valores: 'ATAQUE', 'OUTROS', 'DESCONHECIDO'
+ - status_fuga: fuga_enum Possíveis valores: 'VEÍCULO', 'A PÉ', 'NÃO FUGIU', 'DESCONHECIDO'
+ - policial_com_camera: BOOLEAN
+ - sexo_vitima: genero_enum
+ - raca_vitima: raca_enum
+ - tipo_vitima: tipo_de_pessoa_enum Valor possível: 'VÍTIMA'
+ - faixa_etaria_vitima: TEXT
+ - estado, cidade, latitude, longitude: idem acima
+
+View: VTiroteio
+ - data_tiro: DATE
+ - causa_morte: VARCHAR(255) (ou 'DESCONHECIDA')
+ - arma_usada: VARCHAR(255) (arma usada pela vítima, ou 'DESCONHECIDA')
+ - departamento_policia: VARCHAR(255)
+ - status_ameaca: ameaca_enum Possíveis valores: 'ATAQUE', 'OUTROS', 'DESCONHECIDO'
+ - status_fuga: fuga_enum Possíveis valores: 'VEÍCULO', 'A PÉ', 'NÃO FUGIU', 'DESCONHECIDO'
+ - policial_com_camera: BOOLEAN
+ - sexo_vitima: genero_enum
+ - raca_vitima: raca_enum
+ - tipo_vitima: tipo_de_pessoa_enum Valores possíveis: 'POLICIAL', 'VÍTIMA', 'CRIMINOSO'
+ - faixa_etaria_vitima: TEXT
+ - estado, cidade, latitude, longitude: idem acima

@@ -1,0 +1,11 @@
+services:
+  llm:
+    build:
+      context: .
+    volumes:
+      - .:/app:cached
+    ports:
+      - 8501:8501
+    working_dir: /app
+    command: sleep infinity
+    stop_grace_period: 2s
