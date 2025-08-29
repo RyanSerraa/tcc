@@ -78,7 +78,7 @@ class AgentManager:
                 FROM rag_documentos
                 WHERE agente = %s
                 ORDER BY embedding_pergunta <-> %s::vector
-                LIMIT 3
+                LIMIT 5
                 """,
                 (agente, query_emb_vector),
             )

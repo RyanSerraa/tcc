@@ -3,8 +3,7 @@ import os
 
 import psycopg2
 from dotenv import load_dotenv
-from langchain.embeddings import HuggingFaceEmbeddings
-
+from langchain_huggingface import HuggingFaceEmbeddings
 load_dotenv()
 embeddings_model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
@@ -13,7 +12,7 @@ conn = psycopg2.connect(DATABASE_URL)
 cur = conn.cursor()
 
 # Lendo CSV
-with open("base_conhecimento.csv", newline="", encoding="utf-8") as csvfile:
+with open("insercao.csv", newline="", encoding="utf-8") as csvfile:
     reader = csv.DictReader(csvfile)
     for row in reader:
         pergunta = row["pergunta"]
