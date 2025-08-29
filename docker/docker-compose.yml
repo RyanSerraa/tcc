@@ -1,0 +1,18 @@
+version: '3.9'
+
+services:
+  llm:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    env_file:
+      - ../.env
+    volumes:
+      - ../src:/app/src:cached  # monta src para desenvolvimento
+    ports:
+      - 8501:8501
+    working_dir: /app
+    environment:
+      - PYTHONPATH=/app
+    command: sleep infinity
+    stop_grace_period: 2s
