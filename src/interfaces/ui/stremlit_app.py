@@ -1,6 +1,6 @@
 import streamlit as st
 
-from controller.query_manager import QueryManager
+from src.application.query_manager import QueryManager
 
 
 class Index:

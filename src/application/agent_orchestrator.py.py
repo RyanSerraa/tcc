@@ -3,7 +3,7 @@ import re
 import pandas as pd
 from langgraph.graph import END, START, StateGraph
 from psycopg2.extras import DictCursor, Json
-from model.state import State
+from src.domain.state import State
 
 
 class AgentManager:

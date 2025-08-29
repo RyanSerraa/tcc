@@ -1,11 +1,14 @@
 compose-up:
-	docker compose -f docker-compose.yml up -d --build
+	docker compose -f docker/docker-compose.yml up -d --build
+
 compose-down:
-	docker compose -f docker-compose.yml -v down
+	docker compose -f docker/docker-compose.yml down -v
+
 exec-llm:
-	docker compose -f docker-compose.yml exec -it llm bash
+	docker compose -f docker/docker-compose.yml exec llm bash
+
 llm-install:
 	pip install -r requirements.txt
 
 llm-run:
-	streamlit run main.py
+	streamlit run src/main.py
