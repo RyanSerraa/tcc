@@ -29,7 +29,7 @@ class AgentManager:
         self._build_workflow()
         self.chain = self.workflow.compile()
         self.departamentos_set = set(
-            pd.read_csv("resources/depts.csv", header=None)[0].str.lower()
+            pd.read_csv("src/resources/depts.csv", header=None)[0].str.lower()
         )
 
     def _build_workflow(self):

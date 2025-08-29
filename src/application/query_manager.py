@@ -1,5 +1,5 @@
 # query_manager.py
-from src.domain.agent_manager import AgentManager
+from src.application.agent_orchestrator import AgentManager
 
 
 class QueryManager:

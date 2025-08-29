@@ -2,9 +2,9 @@ import logging
 from src.infrastructure.ai_agents import Agents
 from src.infrastructure.db import db
 from src.infrastructure.embeddings import Embeddings
-from src.domain.agent_manager import AgentManager
+from src.application.agent_orchestrator import AgentManager
 from src.application.query_manager import QueryManager
-from src.interfaces.ui import Index
+from src.interfaces.ui.stremlit_app import Index
 from config.config import Config
 
 
@@ -31,7 +31,8 @@ class Main:
             logging.error(f"Erro ao carregar agentes: {e}", exc_info=True)
             return
 
-        schema_text = self.load_file("resources/schema.txt")
+        schema_text = self.load_file("src/resources/schema.txt")
+
 
         # Inicializar embeddings
         embeddings = Embeddings().load_model()
