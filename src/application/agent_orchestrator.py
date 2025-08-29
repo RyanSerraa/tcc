@@ -2,8 +2,10 @@
 import re
 import pandas as pd
 from langgraph.graph import END, START, StateGraph
-from psycopg2.extras import DictCursor, Json
+from psycopg2.extras import Json, DictCursor
+from src.application.run_query import RunQuery
 from src.domain.state import State
+from src.application.supervisor import Supervisor
 
 
 class AgentManager:
@@ -23,14 +25,15 @@ class AgentManager:
         self.text_editor = text_editor_agent
         self.chart_editor = chart_editor_agent
         self.web_search = web_search_agent
-        self.supervisor = supervisor_agent
         self.embeddings_model = embeddings_model
-        self.workflow = StateGraph(State)
-        self._build_workflow()
-        self.chain = self.workflow.compile()
         self.departamentos_set = set(
             pd.read_csv("src/resources/depts.csv", header=None)[0].str.lower()
         )
+        self.run_query = RunQuery(connection).run_query
+        self.supervisor = supervisor_agent
+        self.workflow = StateGraph(State)
+        self._build_workflow()
+        self.chain = self.workflow.compile()
 
     def _build_workflow(self):
         self.workflow.add_node("choose_chain", self.choose_chain)
@@ -110,7 +113,7 @@ class AgentManager:
             response.choices[0].message.content.strip() if response.choices else ""
         )
         return {"isEUA": resposta_texto.lower() == "sim"}
-
+    
     def verifySupervisorAnswer(self, state: State):
         return "Yes" if state.get("isEUA") else "No"
 
@@ -139,21 +142,7 @@ class AgentManager:
         content = "".join(choice.message.content for choice in response.choices)
         cleanedQuery = self.clean_text(content)
         return {"query": cleanedQuery}
-
-    def run_query(self, sql_query: dict):
-        try:
-            with self.connection.cursor(cursor_factory=DictCursor) as cursor:
-                query = sql_query["query"].strip()
-                cursor.execute(query)
-                if query.lower().startswith("select"):
-                    rows = cursor.fetchall()
-                    return {"result": [dict(row) for row in rows]}
-                else:
-                    self.connection.commit()
-                    return {"affected_rows": cursor.rowcount}
-        except Exception as e:
-            return {"status": "error", "message": str(e)}
-
+    
     def respondWithChart(self, state: State):
         prompt = f"Pergunta: \"{state['question']}\".\nDados: \"{state['result']}\".\n"
         response = self.chart_editor.chat.completions.create(
