@@ -1,6 +1,5 @@
 from unittest.mock import MagicMock
 
-
 from src.application.web_search import WebSearch
 from src.domain.state import State
 

@@ -1,6 +1,5 @@
 from unittest.mock import MagicMock
 
-
 from src.application.text_editor import TextEditor
 from src.domain.state import State
 

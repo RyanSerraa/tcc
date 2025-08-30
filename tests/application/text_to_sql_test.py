@@ -1,6 +1,5 @@
 from unittest.mock import MagicMock
 
-
 from src.application.text_to_sql import TextToSQL
 from src.domain.state import State
 

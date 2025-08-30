@@ -1,6 +1,5 @@
 from unittest.mock import MagicMock
 
-
 from src.application.query_manager import QueryManager
 
 
