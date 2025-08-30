@@ -9,3 +9,7 @@ typing-extensions
 langgraph
 sentence-transformers
 langchain-huggingface
+pytest
+isort
+ruff
+black

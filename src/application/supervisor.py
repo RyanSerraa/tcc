@@ -1,5 +1,6 @@
-from src.domain.state import State
 import pandas as pd
+
+from src.domain.state import State
 
 
 class Supervisor:

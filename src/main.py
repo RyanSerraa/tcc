@@ -1,16 +1,17 @@
 import logging
+
+from config.config import Config
+from src.application.agent_orchestrator import AgentManager
+from src.application.chart_editor import ChartEditor
+from src.application.query_manager import QueryManager
+from src.application.supervisor import Supervisor
+from src.application.text_editor import TextEditor
+from src.application.text_to_sql import TextToSQL
+from src.application.web_search import WebSearch
 from src.infrastructure.ai_agents import Agents
 from src.infrastructure.db import db
 from src.infrastructure.embeddings import Embeddings
-from src.application.agent_orchestrator import AgentManager
-from src.application.query_manager import QueryManager
-from src.application.supervisor import Supervisor
-from src.application.text_to_sql import TextToSQL
-from src.application.web_search import WebSearch
-from src.application.text_editor import TextEditor
-from src.application.chart_editor import ChartEditor
 from src.interfaces.ui.stremlit_app import Index
-from config.config import Config
 
 
 class Main:

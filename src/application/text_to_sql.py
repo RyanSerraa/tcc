@@ -1,5 +1,6 @@
-from src.domain.state import State
 import re
+
+from src.domain.state import State
 
 
 class TextToSQL:
