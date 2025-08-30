@@ -45,8 +45,5 @@ jobs:
       - name: Lint with Ruff
         run: ruff check .
 
-      - name: Lint with Flake8
-        run: flake8 .
-
       - name: Test with pytest
         run: pytest
