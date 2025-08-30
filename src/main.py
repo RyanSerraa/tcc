@@ -48,7 +48,9 @@ class Main:
         connection = None
         try:
             if self.config.db_url is None:
-                raise ValueError("Database URL (db_url) is not set in the configuration.")
+                raise ValueError(
+                    "Database URL (db_url) is not set in the configuration."
+                )
             connection = db().get_connection(self.config.db_url)
             agent_manager = AgentManager(
                 connection=connection,
