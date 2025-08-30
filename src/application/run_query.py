@@ -1,4 +1,6 @@
 from psycopg2.extras import DictCursor
+
+
 class RunQuery:
     def __init__(self, connection):
         self.connection = connection

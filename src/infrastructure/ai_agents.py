@@ -3,7 +3,7 @@ from openai import OpenAI
 
 
 class Agents:
-    
+
     @staticmethod
     @st.cache_resource
     def load_agent(agentEndpoint, apiKey):
