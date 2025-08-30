@@ -47,7 +47,9 @@ class Main:
         # Conectar ao banco e criar managers
         connection = None
         try:
-            connection = db.get_connection(self.config.db_url)
+            if self.config.db_url is None:
+                raise ValueError("Database URL (db_url) is not set in the configuration.")
+            connection = db().get_connection(self.config.db_url)
             agent_manager = AgentManager(
                 connection=connection,
                 text_to_sql_agent=text_to_sql_agent,
