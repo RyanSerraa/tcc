@@ -45,7 +45,9 @@ class AgentManager:
             ),
         )
         self.workflow.add_node("run_query", self.run_query)
-        self.workflow.add_node("respondWithChart", self.respondWithChart)
+        self.workflow.add_node(
+            "respondWithChart", lambda state: self.chart_editor.respond(state)
+        )
         self.workflow.add_node(
             "respondWithText", lambda state: self.text_editor.respond(state)
         )
@@ -71,17 +73,3 @@ class AgentManager:
 
     def hasChart(self, state: State):
         return "Yes" if "gráfico" in state.get("question", "").lower() else "No"
-
-    def respondWithChart(self, state: State):
-        prompt = f"Pergunta: \"{state['question']}\".\nDados: \"{state['result']}\".\n"
-        response = self.chart_editor.chat.completions.create(
-            model="n/a",
-            messages=[{"role": "user", "content": prompt}],
-            extra_body={"include_retrieval_info": True},
-        )
-        answer = (
-            response.choices[0].message.content.strip()
-            if response.choices and hasattr(response.choices[0].message, "content")
-            else ""
-        )
-        return {"answer": answer}

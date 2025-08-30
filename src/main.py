@@ -8,6 +8,7 @@ from src.application.supervisor import Supervisor
 from src.application.text_to_sql import TextToSQL
 from src.application.web_search import WebSearch
 from src.application.text_editor import TextEditor
+from src.application.chart_editor import ChartEditor
 from src.interfaces.ui.stremlit_app import Index
 from config.config import Config
 
@@ -27,7 +28,9 @@ class Main:
         try:
             text_to_sql_agent = TextToSQL(Agents.load_agent(*self.config.text_to_sql))
             text_editor_agent = TextEditor(Agents.load_agent(*self.config.text_editor))
-            chart_editor_agent = Agents.load_agent(*self.config.chart_editor)
+            chart_editor_agent = ChartEditor(
+                Agents.load_agent(*self.config.chart_editor)
+            )
             web_search_agent = WebSearch(Agents.load_agent(*self.config.web_search))
             supervisor_agent = Supervisor(Agents.load_agent(*self.config.supervisor))
             logging.info("Todos os agentes carregados com sucesso")
