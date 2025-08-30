@@ -27,7 +27,7 @@ View: VCrime
 View: VMortePolicial
  - data_morte: DATE
  - causa_morte: VARCHAR(255)
- - departamento_policia: VARCHAR(255)
+ - departamento_policial: VARCHAR(255)
  - tipo_policia: tipo_de_pessoa_enum (valor: 'POLICIAL')
  - estado, cidade, latitude, longitude: idem acima
 
@@ -35,7 +35,7 @@ View: VConfrontosFatais
  - data_morte: DATE
  - causa_morte: VARCHAR(255) (ou 'DESCONHECIDA')
  - arma_usada: VARCHAR(255) (arma usada pela vítima, ou 'DESCONHECIDA')
- - departamento_policia: VARCHAR(255)
+ - departamento_policial: VARCHAR(255)
  - status_ameaca: ameaca_enum Possíveis valores: 'ATAQUE', 'OUTROS', 'DESCONHECIDO'
  - status_fuga: fuga_enum Possíveis valores: 'VEÍCULO', 'A PÉ', 'NÃO FUGIU', 'DESCONHECIDO'
  - policial_com_camera: BOOLEAN
@@ -46,10 +46,10 @@ View: VConfrontosFatais
  - estado, cidade, latitude, longitude: idem acima
 
 View: VTiroteio
- - data_tiro: DATE
+ - data_morte: DATE
  - causa_morte: VARCHAR(255) (ou 'DESCONHECIDA')
  - arma_usada: VARCHAR(255) (arma usada pela vítima, ou 'DESCONHECIDA')
- - departamento_policia: VARCHAR(255)
+ - departamento_policial: VARCHAR(255)
  - status_ameaca: ameaca_enum Possíveis valores: 'ATAQUE', 'OUTROS', 'DESCONHECIDO'
  - status_fuga: fuga_enum Possíveis valores: 'VEÍCULO', 'A PÉ', 'NÃO FUGIU', 'DESCONHECIDO'
  - policial_com_camera: BOOLEAN
