@@ -1,6 +1,5 @@
 from unittest.mock import MagicMock
 
-
 from src.application.chart_editor import ChartEditor
 from src.domain.state import State
 

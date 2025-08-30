@@ -1,7 +1,8 @@
-import pytest
 from unittest.mock import MagicMock
+
 from src.application.web_search import WebSearch
 from src.domain.state import State
+
 
 def test_web_search_respond():
     mock_agent = MagicMock()
@@ -11,13 +12,15 @@ def test_web_search_respond():
 
     web_search = WebSearch(mock_agent)
 
-    state = State({
-        "question": "Qual é a capital da Califórnia?",
-        "isEUA": True,
-        "query": "",
-        "result": "",
-        "answer": ""
-    })
+    state = State(
+        {
+            "question": "Qual é a capital da Califórnia?",
+            "isEUA": True,
+            "query": "",
+            "result": "",
+            "answer": "",
+        }
+    )
 
     result = web_search.search(state)
 
