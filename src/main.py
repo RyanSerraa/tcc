@@ -4,6 +4,7 @@ from src.infrastructure.db import db
 from src.infrastructure.embeddings import Embeddings
 from src.application.agent_orchestrator import AgentManager
 from src.application.query_manager import QueryManager
+from src.application.supervisor import Supervisor
 from src.interfaces.ui.stremlit_app import Index
 from config.config import Config
 
@@ -25,7 +26,7 @@ class Main:
             text_editor_agent = Agents.load_agent(*self.config.text_editor)
             chart_editor_agent = Agents.load_agent(*self.config.chart_editor)
             web_search_agent = Agents.load_agent(*self.config.web_search)
-            supervisor_agent = Agents.load_agent(*self.config.supervisor)
+            supervisor_agent = Supervisor(Agents.load_agent(*self.config.supervisor))
             logging.info("Todos os agentes carregados com sucesso")
         except Exception as e:
             logging.error(f"Erro ao carregar agentes: {e}", exc_info=True)

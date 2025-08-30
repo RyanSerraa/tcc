@@ -24,9 +24,6 @@ class AgentManager:
         self.chart_editor = chart_editor_agent
         self.web_search = web_search_agent
         self.embeddings = embeddings
-        self.departamentos_set = set(
-            pd.read_csv("src/resources/depts.csv", header=None)[0].str.lower()
-        )
         self.run_query = RunQuery(connection).run_query
         self.supervisor = supervisor_agent
         self.workflow = StateGraph(State)
@@ -34,16 +31,21 @@ class AgentManager:
         self.chain = self.workflow.compile()
 
     def _build_workflow(self):
-        self.workflow.add_node("choose_chain", self.choose_chain)
+        self.workflow.add_node(
+            "supervisor",
+            lambda state: self.supervisor.choose_chain(
+                state, self.embeddings, self.connection
+            ),
+        )
         self.workflow.add_node("searchWeb", self.searchWeb)
         self.workflow.add_node("to_sql_query", self.to_sql_query)
         self.workflow.add_node("run_query", self.run_query)
         self.workflow.add_node("respondWithChart", self.respondWithChart)
         self.workflow.add_node("respondWithText", self.respondWithText)
 
-        self.workflow.add_edge(START, "choose_chain")
+        self.workflow.add_edge(START, "supervisor")
         self.workflow.add_conditional_edges(
-            "choose_chain",
+            "supervisor",
             self.verifySupervisorAnswer,
             {"Yes": "to_sql_query", "No": "searchWeb"},
         )
@@ -66,27 +68,6 @@ class AgentManager:
         if match:
             return match.group(0).strip()
         return text.strip()
-
-    def choose_chain(self, state: State):
-        question = state["question"].lower()
-        hasFoundDept = any(dep.lower() in question for dep in self.departamentos_set)
-        contexto = self.embeddings.getContext(
-            state["question"], "supervisor", self.connection
-        )
-        prompt = (
-            f"Contexto relevante:\n{contexto}\n"
-            f'Pergunta do usuário: "{state["question"]}".\n'
-            f"temDepartamentoEncontrado: {hasFoundDept}"
-        )
-        response = self.supervisor.chat.completions.create(
-            model="n/a",
-            messages=[{"role": "user", "content": prompt}],
-            extra_body={"include_retrieval_info": True},
-        )
-        resposta_texto = (
-            response.choices[0].message.content.strip() if response.choices else ""
-        )
-        return {"isEUA": resposta_texto.lower() == "sim"}
 
     def verifySupervisorAnswer(self, state: State):
         return "Yes" if state.get("isEUA") else "No"
