@@ -33,9 +33,8 @@ class Main:
 
         schema_text = self.load_file("src/resources/schema.txt")
 
-
         # Inicializar embeddings
-        embeddings = Embeddings().load_model()
+        embeddings = Embeddings()
 
         # Conectar ao banco e criar managers
         connection = None
@@ -48,7 +47,7 @@ class Main:
                 chart_editor_agent=chart_editor_agent,
                 web_search_agent=web_search_agent,
                 supervisor_agent=supervisor_agent,
-                embeddings_model=embeddings,
+                embeddings=embeddings,
             )
 
             query_manager = QueryManager(agent_manager=agent_manager)

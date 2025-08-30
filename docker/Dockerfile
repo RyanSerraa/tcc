@@ -12,6 +12,7 @@ WORKDIR /app
 
 # Copia requirements e instala pacotes
 COPY ../requirements.txt .
+COPY ../Makefile .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copia todo o código-fonte

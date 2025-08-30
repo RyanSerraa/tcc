@@ -2,10 +2,8 @@
 import re
 import pandas as pd
 from langgraph.graph import END, START, StateGraph
-from psycopg2.extras import Json, DictCursor
 from src.application.run_query import RunQuery
 from src.domain.state import State
-from src.application.supervisor import Supervisor
 
 
 class AgentManager:
@@ -18,14 +16,14 @@ class AgentManager:
         chart_editor_agent,
         web_search_agent,
         supervisor_agent,
-        embeddings_model,
+        embeddings,
     ):
         self.connection = connection
         self.text_to_sql = text_to_sql_agent
         self.text_editor = text_editor_agent
         self.chart_editor = chart_editor_agent
         self.web_search = web_search_agent
-        self.embeddings_model = embeddings_model
+        self.embeddings = embeddings
         self.departamentos_set = set(
             pd.read_csv("src/resources/depts.csv", header=None)[0].str.lower()
         )
@@ -69,36 +67,12 @@ class AgentManager:
             return match.group(0).strip()
         return text.strip()
 
-    def getContext(self, question: str, agente: str) -> str:
-        query_emb = self.embeddings_model.embed_query(question)
-        query_emb_vector = Json(query_emb)
-        resultados = []
-
-        with self.connection.cursor(cursor_factory=DictCursor) as cursor:
-            cursor.execute(
-                """
-                SELECT pergunta, resposta
-                FROM rag_documentos
-                WHERE agente = %s
-                ORDER BY embedding_pergunta <-> %s::vector
-                LIMIT 5
-                """,
-                (agente, query_emb_vector),
-            )
-            resultados = cursor.fetchall()
-
-        contexto = "\n".join(
-            [
-                f"{i+1}. Pergunta: {r['pergunta']}\n   Resposta: {r['resposta']}"
-                for i, r in enumerate(resultados)
-            ]
-        )
-        return contexto
-
     def choose_chain(self, state: State):
         question = state["question"].lower()
         hasFoundDept = any(dep.lower() in question for dep in self.departamentos_set)
-        contexto = self.getContext(state["question"], "supervisor")
+        contexto = self.embeddings.getContext(
+            state["question"], "supervisor", self.connection
+        )
         prompt = (
             f"Contexto relevante:\n{contexto}\n"
             f'Pergunta do usuário: "{state["question"]}".\n'
@@ -113,7 +87,7 @@ class AgentManager:
             response.choices[0].message.content.strip() if response.choices else ""
         )
         return {"isEUA": resposta_texto.lower() == "sim"}
-    
+
     def verifySupervisorAnswer(self, state: State):
         return "Yes" if state.get("isEUA") else "No"
 
@@ -132,7 +106,9 @@ class AgentManager:
 
     def to_sql_query(self, state: State):
         cleanedQuestion = state["question"].replace(" em gráfico", "")
-        contexto = self.getContext(state["question"], "text_to_sql")
+        contexto = self.embeddings.getContext(
+            state["question"], "text_to_sql", self.connection
+        )
         final_prompt = f"Pergunta do usuario:\n{cleanedQuestion}\n\nContexto relevante:\n{contexto}"
         response = self.text_to_sql.chat.completions.create(
             model="n/a",
@@ -142,7 +118,7 @@ class AgentManager:
         content = "".join(choice.message.content for choice in response.choices)
         cleanedQuery = self.clean_text(content)
         return {"query": cleanedQuery}
-    
+
     def respondWithChart(self, state: State):
         prompt = f"Pergunta: \"{state['question']}\".\nDados: \"{state['result']}\".\n"
         response = self.chart_editor.chat.completions.create(

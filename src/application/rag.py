@@ -4,6 +4,7 @@ import os
 import psycopg2
 from dotenv import load_dotenv
 from langchain_huggingface import HuggingFaceEmbeddings
+
 load_dotenv()
 embeddings_model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
