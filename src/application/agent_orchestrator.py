@@ -37,7 +37,7 @@ class AgentManager:
                 state, self.embeddings, self.connection
             ),
         )
-        self.workflow.add_node("searchWeb", self.searchWeb)
+        self.workflow.add_node("searchWeb", lambda state: self.web_search.search(state))
         self.workflow.add_node(
             "to_sql_query",
             lambda state: self.text_to_sql.to_sql_query(
@@ -69,16 +69,6 @@ class AgentManager:
 
     def hasChart(self, state: State):
         return "Yes" if "gráfico" in state.get("question", "").lower() else "No"
-
-    def searchWeb(self, state: State):
-        prompt = f"Pergunta: \"{state['question']}\"."
-        response = self.web_search.chat.completions.create(
-            model="n/a",
-            messages=[{"role": "user", "content": prompt}],
-            extra_body={"include_retrieval_info": True},
-        )
-        answer = response.choices[0].message.content.strip() if response.choices else ""
-        return {"answer": answer}
 
     def respondWithChart(self, state: State):
         prompt = f"Pergunta: \"{state['question']}\".\nDados: \"{state['result']}\".\n"
