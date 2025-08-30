@@ -1,6 +1,8 @@
-import pytest
 from unittest.mock import MagicMock
+
+
 from src.application.run_query import RunQuery
+
 
 def test_run_query_select():
     mock_cursor = MagicMock()
@@ -13,4 +15,6 @@ def test_run_query_select():
     result = rq.run_query({"query": "SELECT * FROM DLocalidade WHERE estado = 'Texas'"})
 
     assert result == {"result": [{"id": 1, "state": "Texas"}]}
-    mock_cursor.execute.assert_called_once_with("SELECT * FROM DLocalidade WHERE estado = 'Texas'")
+    mock_cursor.execute.assert_called_once_with(
+        "SELECT * FROM DLocalidade WHERE estado = 'Texas'"
+    )

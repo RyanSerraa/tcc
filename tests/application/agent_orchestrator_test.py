@@ -82,4 +82,3 @@ def test_workflow_edges_exist(agent_manager):
     assert ("__start__", "supervisor") in edge_list
     assert ("respondWithText", "__end__") in edge_list
     assert ("respondWithChart", "__end__") in edge_list
-

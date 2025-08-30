@@ -1,8 +1,10 @@
-import pandas as pd
 from unittest.mock import MagicMock, patch
-import pytest
+
+import pandas as pd
+
 from src.application.supervisor import Supervisor
 from src.domain.state import State
+
 
 def test_supervisor_choose_chain_yes():
     # Mock do agente
@@ -22,13 +24,15 @@ def test_supervisor_choose_chain_yes():
     with patch("pandas.read_csv", return_value=df_mock):
         supervisor = Supervisor(mock_agent)
 
-    state = State({
-        "question": "Finance department question",
-        "isEUA": False,
-        "query": "",
-        "result": "",
-        "answer": ""
-    })
+    state = State(
+        {
+            "question": "Finance department question",
+            "isEUA": False,
+            "query": "",
+            "result": "",
+            "answer": "",
+        }
+    )
 
     result = supervisor.choose_chain(state, mock_embeddings, None)
 

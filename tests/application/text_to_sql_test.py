@@ -1,7 +1,9 @@
-import pytest
 from unittest.mock import MagicMock
+
+
 from src.application.text_to_sql import TextToSQL
 from src.domain.state import State
+
 
 def test_text_to_sql_query():
     # Mock do agente
@@ -19,13 +21,15 @@ def test_text_to_sql_query():
 
     text_to_sql = TextToSQL(mock_agent)
 
-    state = State({
-        "question": "Liste todos os usuários em gráfico",
-        "isEUA": True,
-        "query": "",
-        "result": "",
-        "answer": ""
-    })
+    state = State(
+        {
+            "question": "Liste todos os usuários em gráfico",
+            "isEUA": True,
+            "query": "",
+            "result": "",
+            "answer": "",
+        }
+    )
 
     result = text_to_sql.to_sql_query(state, mock_embeddings, mock_connection)
 
