@@ -5,6 +5,7 @@ from src.infrastructure.embeddings import Embeddings
 from src.application.agent_orchestrator import AgentManager
 from src.application.query_manager import QueryManager
 from src.application.supervisor import Supervisor
+from src.application.text_to_sql import TextToSQL
 from src.interfaces.ui.stremlit_app import Index
 from config.config import Config
 
@@ -22,7 +23,7 @@ class Main:
     def run(self):
         # Carregar agentes
         try:
-            text_to_sql_agent = Agents.load_agent(*self.config.text_to_sql)
+            text_to_sql_agent = TextToSQL(Agents.load_agent(*self.config.text_to_sql))
             text_editor_agent = Agents.load_agent(*self.config.text_editor)
             chart_editor_agent = Agents.load_agent(*self.config.chart_editor)
             web_search_agent = Agents.load_agent(*self.config.web_search)

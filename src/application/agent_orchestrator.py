@@ -38,7 +38,12 @@ class AgentManager:
             ),
         )
         self.workflow.add_node("searchWeb", self.searchWeb)
-        self.workflow.add_node("to_sql_query", self.to_sql_query)
+        self.workflow.add_node(
+            "to_sql_query",
+            lambda state: self.text_to_sql.to_sql_query(
+                state, self.embeddings, self.connection
+            ),
+        )
         self.workflow.add_node("run_query", self.run_query)
         self.workflow.add_node("respondWithChart", self.respondWithChart)
         self.workflow.add_node("respondWithText", self.respondWithText)
@@ -59,16 +64,6 @@ class AgentManager:
         self.workflow.add_edge("respondWithChart", END)
         self.workflow.add_edge("searchWeb", END)
 
-    @staticmethod
-    def clean_text(text: str) -> str:
-        match = re.search(r"```sql(.*?)```", text, re.DOTALL | re.IGNORECASE)
-        if match:
-            return match.group(1).strip()
-        match = re.search(r"SELECT .*?;", text, re.DOTALL | re.IGNORECASE)
-        if match:
-            return match.group(0).strip()
-        return text.strip()
-
     def verifySupervisorAnswer(self, state: State):
         return "Yes" if state.get("isEUA") else "No"
 
@@ -84,21 +79,6 @@ class AgentManager:
         )
         answer = response.choices[0].message.content.strip() if response.choices else ""
         return {"answer": answer}
-
-    def to_sql_query(self, state: State):
-        cleanedQuestion = state["question"].replace(" em gráfico", "")
-        contexto = self.embeddings.getContext(
-            state["question"], "text_to_sql", self.connection
-        )
-        final_prompt = f"Pergunta do usuario:\n{cleanedQuestion}\n\nContexto relevante:\n{contexto}"
-        response = self.text_to_sql.chat.completions.create(
-            model="n/a",
-            messages=[{"role": "user", "content": final_prompt}],
-            extra_body={"include_retrieval_info": True},
-        )
-        content = "".join(choice.message.content for choice in response.choices)
-        cleanedQuery = self.clean_text(content)
-        return {"query": cleanedQuery}
 
     def respondWithChart(self, state: State):
         prompt = f"Pergunta: \"{state['question']}\".\nDados: \"{state['result']}\".\n"
