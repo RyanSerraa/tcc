@@ -83,14 +83,3 @@ def test_workflow_edges_exist(agent_manager):
     assert ("respondWithText", "__end__") in edge_list
     assert ("respondWithChart", "__end__") in edge_list
 
-
-# def test_supervisor_node_called(agent_manager, mock_agents):
-#     mock_agents["supervisor_agent"].choose_chain.return_value = "some_chain"
-
-#     state = State({"isEUA": True})
-#     result = agent_manager.workflow.run_node("supervisor", state)
-
-#     mock_agents["supervisor_agent"].choose_chain.assert_called_once_with(
-#         state, mock_agents["embeddings"], mock_agents["connection"]
-#     )
-#     assert result == "some_chain"
