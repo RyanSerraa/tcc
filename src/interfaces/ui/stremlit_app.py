@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 
 from src.application.query_manager import QueryManager
 
@@ -347,14 +348,19 @@ class Index:
                 else:
                     with st.spinner("🧠 Processando sua solicitação..."):
                         try:
-                            # 🚀 Chamada ao backend (AgentManager)
                             result = self.query_manager.consultar_dados(query)
 
-                            # Pega a resposta
                             answer = result.get("answer") or result.get("result")
 
                             st.markdown("### 🔍 Resultado")
-                            st.write(answer)
+                            
+                            if isinstance(answer, str):
+                                if any(tag in answer.lower() for tag in ["<html", "<div", "<canvas", "<script"]):
+                                    components.html(answer, height=500, scrolling=True)
+                                else:
+                                    st.write(answer)  
+                            else:
+                                st.write(answer)
 
                             # Botões de ação
                             col1, col2 = st.columns([1, 1])
