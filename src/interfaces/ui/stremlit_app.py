@@ -353,12 +353,15 @@ class Index:
                             answer = result.get("answer") or result.get("result")
 
                             st.markdown("### 🔍 Resultado")
-                            
+
                             if isinstance(answer, str):
-                                if any(tag in answer.lower() for tag in ["<html", "<div", "<canvas", "<script"]):
+                                if any(
+                                    tag in answer.lower()
+                                    for tag in ["<html", "<div", "<canvas", "<script"]
+                                ):
                                     components.html(answer, height=500, scrolling=True)
                                 else:
-                                    st.write(answer)  
+                                    st.write(answer)
                             else:
                                 st.write(answer)
 
