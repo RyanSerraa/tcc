@@ -16,7 +16,7 @@ Além dos gráficos do **Metabase**, o sistema conta com **agents** baseados em 
 
 - **Linguagem:** Python 3.11  
 - **Frameworks / Bibliotecas:** LangGraph, psycopg2, pandas, Streamlit  
-- **Banco de Dados:** PostgreSQL  
+- **Banco de Dados:** Cockroachdb  
 - **Infraestrutura:** Docker, Docker Compose, Makefile  
 - **Testes:** Pytest  
 
