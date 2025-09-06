@@ -1,7 +1,6 @@
 # tests/infrastructure/embeddings_test.py
 from unittest.mock import MagicMock, patch
 
-
 from src.infrastructure.embeddings import Embeddings
 
 
