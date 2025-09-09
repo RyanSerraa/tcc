@@ -22,10 +22,19 @@ class TextToSQL:
 
     @staticmethod
     def clean_text(text: str) -> str:
-        match = re.search(r"```sql(.*?)```", text, re.DOTALL | re.IGNORECASE)
-        if match:
-            return match.group(1).strip()
-        match = re.search(r"SELECT .*?;", text, re.DOTALL | re.IGNORECASE)
-        if match:
-            return match.group(0).strip()
-        return text.strip()
+        keywords = [
+            "insert",
+            "delete",
+            "update",
+            "drop",
+            "create",
+            "alter",
+            "truncate",
+            "merge",
+            "call",
+            "exec",
+        ]
+        for keyword in keywords:
+            if keyword.lower() in text.lower():
+                return ""
+        return text
