@@ -2,7 +2,7 @@ Views e colunas
 
 View: VPrisao
  - data_prisao: DATE (data da prisão)
- - crime: VARCHAR(255) (nome do crime)
+ - nome_crime: VARCHAR(255) (nome do crime)
  - droga: VARCHAR(255) (nome da droga) Possíveis valores: 'SUBSTÂNCIA CONTROLADA', 'CRACK', 'ECSTASY', 'GHB', 'HEROINA', 'HIDROCODONA', 'KETAMINA', 'MACONHA', 'METANFETAMINA', 'OXICODONA', 'PARAFERNÁLIA', 'COCAÍNA'
  - arma_usada: VARCHAR(255) (arma usada na prisão) Valor padrão quando não informada: 'DESCONHECIDA'
  - sexo_criminoso: genero_enum Possíveis valores: 'MASCULINO', 'FEMININO', 'DESCONHECIDO', 'OUTROS'
