@@ -1,17 +1,21 @@
 import streamlit as st
 import streamlit.components.v1 as components
-
+import pandas as pd
 from src.application.query_manager import QueryManager
 
 
 class Index:
 
-    def __init__(self, query_manager: QueryManager, schema_text: str):
+    def __init__(
+        self, query_manager: QueryManager, schema_text: str, schema_dados: dict
+    ):
         self.query_manager = query_manager
         self.schema_text = schema_text
+        self.schema_dados = schema_dados
 
     def render(self):
         schema_text = self.schema_text
+        schema_dados = self.schema_dados
         st.set_page_config(
             page_title="Text-to-SQL Converter",
             page_icon=":database:",
@@ -308,21 +312,127 @@ class Index:
         with col_left:
             st.markdown("### 📋 Schema Atual")
             with st.expander("Visualizar Schema", expanded=True):
-                st.code(schema_text, language="sql")
+                with st.expander("🚔 Prisões (VPrisao)", expanded=False):
+                    st.caption("Registros de prisões realizadas nos EUA.")
+                    st.markdown(
+                        """
+                    - 📅 **Data da prisão** → Quando o criminoso foi preso (Ex: 2015-09-11)
+                    - ⚖️ **Nome do crime** → Ex: Roubo, Assalto, Homicídio
+                    - 💊 **Droga** → Tipo de droga que o criminoso estava portando (Ex: Maconha, Cocaína, Crack)
+                    - 🔫 **Arma usada** → Arma que o criminoso estava portando (Exemplo: Motosserra, Revolver, Desconhecida)
+                    - 🚻 **Sexo do criminoso** → Masculino, Feminino, Desconhecido, Outros
+                    - 🌎 **Raça do criminoso** → Branco, Negro, Asiático, Hispânico, Outros
+                    - 👤 **Tipo** → Sempre "CRIMINOSO"
+                    - 🎂 **Faixa etária** → Ex: "18 - 24"
+                    - 🗺️ **Localização** → Estado, Cidade, Latitude, Longitude
+                    """
+                    )
+                    st.code(pd.DataFrame(schema_dados["vPrisao"]), language="python")
+
+                with st.expander("⚖️ Crimes (VCrime)", expanded=False):
+                    st.caption("Informações gerais sobre crimes registrados.")
+                    st.markdown(
+                        """
+                    - 📅 **Data do crime** → Quando o criminoso cometeu o crime (Ex: 2015-09-11)
+                    - ⚖️ **Nome do crime** → Ex: Roubo, Assalto, Homicídio
+                    - 🔫 **Arma usada** → Arma que o criminoso estava portando (Exemplo: Motosserra, Revolver, Desconhecida)
+                    - 🚻 **Sexo do criminoso** → Masculino, Feminino, Desconhecido, Outros
+                    - 🌎 **Raça do criminoso** → Branco, Negro, Asiático, Hispânico, Outros
+                    - 👤 **Tipo** → Sempre "CRIMINOSO"
+                    - 🎂 **Faixa etária** → Ex: "18 - 24"
+                    - 🗺️ **Localização** → Estado, Cidade, Latitude, Longitude
+                    """
+                    )
+                    st.code(pd.DataFrame(schema_dados["vCrime"]), language="python")
+
+                with st.expander(
+                    "👮 Mortes de Policiais (VMortePolicial)", expanded=False
+                ):
+                    st.caption("Registros de mortes de policiais em serviço.")
+                    st.markdown(
+                        """
+                    - 📅 **Data da morte** → Quando o policial morreu (Ex: 2015-09-11)
+                    - ⚰️ **Causa da morte** → Causa da morte dos policiais (Ex: Acidente, incêndio, esfaqeuado, etc)
+                    - 🏢 **Departamento policial**
+                    - 👮 **Tipo** → Sempre "POLICIAL"
+                    - 🗺️ **Localização** → Estado, Cidade, Latitude, Longitude
+                    """
+                    )
+                    st.code(
+                        pd.DataFrame(schema_dados["vMortePolicial"]), language="python"
+                    )
+
+                with st.expander(
+                    "💥 Confrontos Fatais (VConfrontosFatais)", expanded=False
+                ):
+                    st.caption(
+                        "Casos em que uma pessoa morreu em confronto com a polícia."
+                    )
+                    st.markdown(
+                        """
+                    - 📅 **Data da morte** → Quando a vítima morreu (Ex: 2015-09-11)
+                    - ⚰️ **Causa da morte** → Causa da morte das vítimas (Ex: Acidente, incêndio, esfaqueado, etc)
+                    - 🔫 **Arma usada** → Arma que a vítima estava portando (Exemplo: Motosserra, Revolver, Desconhecida)
+                    - 🏢 **Departamento policial**
+                    - ⚠️ **Status da ameaça** → ATAQUE, OUTROS, DESCONHECIDO
+                    - 🏃 **Status da fuga** → VEÍCULO, A PÉ, NÃO FUGIU, DESCONHECIDO
+                    - 🎥 **Policial com câmera** → Sim ou Não
+                    - 🚻 **Sexo da vítima** → Masculino, Feminino, Desconhecido, Outros
+                    - 🌎 **Raça da vítima** → Branco, Negro, Asiático, Hispânico, Outros
+                    - 👤 **Tipo** → Sempre "VÍTIMA"
+                    - 🎂 **Faixa etária** → Ex: "18 - 24"
+                    - 🗺️ **Localização** → Estado, Cidade, Latitude, Longitude
+                    """
+                    )
+                    st.code(
+                        pd.DataFrame(schema_dados["vConfrontoFatal"]), language="python"
+                    )
+
+                with st.expander("🔫 Tiroteios (VTiroteio)", expanded=False):
+                    st.caption(
+                        "Registros de tiroteios envolvendo policiais, criminosos e vítimas."
+                    )
+                    st.markdown(
+                        """
+                    - 📅 **Data da morte** → Quando a vítima morreu (Ex: 2011-09-13)
+                    - ⚰️ **Causa da morte** → Causa da morte das vítimas (Ex: Acidente, incêndio, esfaqueado, etc)
+                    - 🔫 **Arma usada** → Arma que a vítima estava portando (Exemplo: Motosserra, Revolver, Desconhecida)
+                    - ⚠️ **Status da ameaça** → ATAQUE, OUTROS, DESCONHECIDO
+                    - 🏃 **Status da fuga** → VEÍCULO, A PÉ, NÃO FUGIU, DESCONHECIDO
+                    - 🎥 **Policial com câmera** → Sim ou Não
+                    - 🚻 **Sexo da vítima** → Masculino, Feminino, Desconhecido, Outros
+                    - 🌎 **Raça da vítima** → Branco, Negro, Asiático, Hispânico, Outros
+                    - 👤 **Tipo** → Sempre "VÍTIMA"
+                    - 🎂 **Faixa etária** → Ex: "18 - 24"
+                    - 🗺️ **Localização** → Estado, Cidade, Latitude, Longitude
+                    """
+                    )
+                    st.code(pd.DataFrame(schema_dados["vTiroteio"]), language="python")
+
+                with st.expander("📜 Ver schema técnico (SQL)", expanded=False):
+                    st.code(schema_text, language="sql")
 
             st.markdown("### 📌 Dicas")
             st.markdown(
                 """
                 <div class="feature-card">
-                    <h4>Seja específico</h4>
-                    <p>Você pode pedir para que a resposta seja textual, em gráfico ou em tabela</p>
+                    <h4>💡 Seja específico</h4>
+                    <ul>
+                        <li>Peça a resposta <code>em texto</code> ou <code>em gráfico</code>.</li>
+                        <li>Para gráficos, adicione <code>- em gráfico</code> no final da pergunta.</li>
+                        <li>Se os resultados forem poucos, prefira a resposta textual.</li>
+                    </ul>
                 </div>
 
                 <div class="feature-card">
-                    <h4>Exemplo de consulta</h4>
-                    <p>"Qual é a principal causa de morte na Califórnia em confrontos fatais?"</p>
+                    <h4>📝 Exemplos de consultas</h4>
+                    <ul>
+                        <li><b>Texto:</b> Qual é a principal causa de morte na Califórnia em confrontos fatais?</li>
+                        <li><b>Gráfico:</b> Qual é a top 10 principais causas de morte na Califórnia em confrontos fatais? <code>- em gráfico</code></li>
+                        <li><b>Gráfico específico:</b> Qual é a top 10 principais causas de morte na Califórnia em confrontos fatais? <code>- em gráfico de barras</code></li>
+                    </ul>
                 </div>
-            """,
+                """,
                 unsafe_allow_html=True,
             )
 
@@ -386,7 +496,7 @@ class Index:
         st.markdown(
             """
             <div style="text-align: center; color: #94a3b8; font-size: 14px; margin-top: 2rem;">
-                <p>Text-to-SQL Converter v2.0 • Desenvolvido com I.A. e LangChain</p>
+                <p>CrimeFlow v2.0 • Desenvolvido com I.A. e LangChain</p>
                 <p style="font-size: 0.8rem;">© 2023 Todos os direitos reservados</p>
             </div>
         """,
