@@ -1,5 +1,6 @@
-from psycopg2.extras import DictCursor
 import re
+
+from psycopg2.extras import DictCursor
 
 
 class RunQuery:

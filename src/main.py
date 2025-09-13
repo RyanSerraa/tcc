@@ -1,5 +1,6 @@
+import json
 import logging
-from typing import Dict, Any
+from typing import Any, Dict
 
 from config.config import Config
 from src.application.agent_orchestrator import AgentManager
@@ -13,7 +14,6 @@ from src.infrastructure.ai_agents import Agents
 from src.infrastructure.db import db
 from src.infrastructure.embeddings import Embeddings
 from src.interfaces.ui.stremlit_app import Index
-import json
 
 
 class Main:

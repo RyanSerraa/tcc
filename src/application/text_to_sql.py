@@ -1,4 +1,3 @@
-import re
 
 from src.domain.state import State
 
