@@ -1,4 +1,3 @@
-
 from src.domain.state import State
 
 
