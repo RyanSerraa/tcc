@@ -10,6 +10,8 @@ from src.application.supervisor import Supervisor
 from src.application.text_editor import TextEditor
 from src.application.text_to_sql import TextToSQL
 from src.application.web_search import WebSearch
+from src.application.jornalista import Jornalista
+from src.application.analista import Analista
 from src.infrastructure.ai_agents import Agents
 from src.infrastructure.db import db
 from src.infrastructure.embeddings import Embeddings
@@ -38,6 +40,8 @@ class Main:
             )
             web_search_agent = WebSearch(Agents.load_agent(*self.config.web_search))
             supervisor_agent = Supervisor(Agents.load_agent(*self.config.supervisor))
+            jornalista_agent = Jornalista(Agents.load_agent(*self.config.jornalista))
+            analista_agent =Analista(Agents.load_agent(*self.config.analista))
             logging.info("Todos os agentes carregados com sucesso")
         except Exception as e:
             logging.error(f"Erro ao carregar agentes: {e}", exc_info=True)
@@ -66,6 +70,8 @@ class Main:
                 chart_editor_agent=chart_editor_agent,
                 web_search_agent=web_search_agent,
                 supervisor_agent=supervisor_agent,
+                jornalista_agent= jornalista_agent,
+                analista_agent= analista_agent,
                 embeddings=embeddings,
             )
 

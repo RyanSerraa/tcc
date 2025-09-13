@@ -28,3 +28,13 @@ class Config:
             os.getenv("SUPERVISOR_AGENT_ENDPOINT"),
             os.getenv("SUPERVISOR_API_KEY"),
         )
+        
+        self.jornalista = (
+            os.getenv("JORNALISTA_AGENT_ENDPOINT"),
+            os.getenv("JORNALISTA_API_KEY"),
+        )
+        
+        self.analista = (
+            os.getenv("ANALISTA_AGENT_ENDPOINT"),
+            os.getenv("ANALISTA_API_KEY"),
+        )
