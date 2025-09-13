@@ -15,6 +15,8 @@ class AgentManager:
         chart_editor_agent,
         web_search_agent,
         supervisor_agent,
+        jornalista_agent,
+        analista_agent,
         embeddings,
     ):
         self.connection = connection
@@ -25,6 +27,8 @@ class AgentManager:
         self.embeddings = embeddings
         self.run_query = RunQuery(connection).run_query
         self.supervisor = supervisor_agent
+        self.jornalista = jornalista_agent
+        self.analista = analista_agent
         self.workflow = StateGraph(State)
         self._build_workflow()
         self.chain = self.workflow.compile()
