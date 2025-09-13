@@ -5,7 +5,7 @@ from psycopg2.extras import DictCursor, Json
 class Embeddings:
     def __init__(self):
         self.embeddings_model = HuggingFaceEmbeddings(
-            model_name="all-MiniLM-L6-v2", model_kwargs={"device": "cpu"}  # força CPU
+            model_name="all-MiniLM-L6-v2", model_kwargs={"device": "cpu"}
         )
 
     def embed_query(self, question: str):

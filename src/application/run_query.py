@@ -1,3 +1,5 @@
+import re
+
 from psycopg2.extras import DictCursor
 
 
@@ -10,7 +12,7 @@ class RunQuery:
             with self.connection.cursor(cursor_factory=DictCursor) as cursor:
                 query = sql_query["query"].strip()
                 cursor.execute(query)
-                if query.lower().startswith("select"):
+                if re.match(r"^(select|with)\b", query, re.IGNORECASE):
                     rows = cursor.fetchall()
                     return {"result": [dict(row) for row in rows]}
                 else:

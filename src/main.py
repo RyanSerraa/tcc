@@ -1,4 +1,6 @@
+import json
 import logging
+from typing import Any, Dict
 
 from config.config import Config
 from src.application.agent_orchestrator import AgentManager
@@ -20,8 +22,10 @@ class Main:
         logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
     @staticmethod
-    def load_file(file):
+    def load_file(file: str, type: str = "text") -> Any:
         with open(file, "r") as f:
+            if type == "json":
+                return json.load(f)
             return f.read()
 
     def run(self):
@@ -39,7 +43,10 @@ class Main:
             logging.error(f"Erro ao carregar agentes: {e}", exc_info=True)
             return
 
-        schema_text = self.load_file("src/resources/schema.txt")
+        schema_text: str = self.load_file("src/resources/schema.txt")
+        schema_dados: Dict[str, Any] = self.load_file(
+            "src/resources/schema_dados.json", type="json"
+        )
 
         # Inicializar embeddings
         embeddings = Embeddings()
@@ -63,7 +70,11 @@ class Main:
             )
 
             query_manager = QueryManager(agent_manager=agent_manager)
-            app = Index(query_manager=query_manager, schema_text=schema_text)
+            app = Index(
+                query_manager=query_manager,
+                schema_text=schema_text,
+                schema_dados=schema_dados,
+            )
             app.render()
         except Exception as e:
             logging.error(f"Erro ao conectar ao banco: {e}", exc_info=True)
