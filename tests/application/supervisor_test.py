@@ -34,6 +34,11 @@ def test_supervisor_choose_chain_yes():
             "isAnalisis": False,
             "isChart": False,
             "isText": False,
+            "agents_done": {
+                "analista": False,
+                "respondWithText": False,
+                "respondWithChart": False,
+            },
         }
     )
 

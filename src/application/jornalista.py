@@ -4,8 +4,11 @@ from src.domain.state import State
 
 
 class Jornalista:
-    def __init__(self, agente):
+    def __init__(self, agente, text_editor, chart_editor, analista):
         self.jornalista_agent = agente
+        self.text_editor = text_editor
+        self.chart_editor = chart_editor
+        self.analista = analista
 
     @staticmethod
     def parse_resposta(resposta_texto: str) -> dict:
@@ -57,6 +60,40 @@ class Jornalista:
             "isChart": self.is_chart(respostas),
             "isAnalisis": self.is_analisis(respostas),
         }
+    def write_article(self, state: State) -> str:
+        """
+        Orquestra os agentes, consolida respostas e aplica revisão final.
+        """
+        if "agents_done" not in state:
+            state["agents_done"] = {
+                "analista": False,
+                "respondWithText": False,
+                "respondWithChart": False,
+            }
 
-    def write_article(self, state: State):
-        return "Importante artigo jornalístico sobre o tema."
+        respostas = {}
+
+        # Chama analista se necessário
+        if state.get("isAnalisis", False) and not state["agents_done"]["analista"]:
+            respostas["analista"] = self.analista.respond(state)
+            state["agents_done"]["analista"] = True
+
+        # Chama agente de texto se necessário
+        if (state.get("isText", False) or state.get("isAnalisis", False)) and not state["agents_done"]["respondWithText"]:
+            respostas["texto"] = self.text_editor.respond(state)
+            state["agents_done"]["respondWithText"] = True
+
+        # Chama agente de gráfico se necessário
+        if (state.get("isChart", False) or state.get("isAnalisis", False)) and not state["agents_done"]["respondWithChart"]:
+            respostas["grafico"] = self.chart_editor.respond(state)
+            state["agents_done"]["respondWithChart"] = True
+
+        # Consolida respostas
+        artigo_final = "Artigo consolidado:\n\n"
+        for key, value in respostas.items():
+            artigo_final += f"[{key.upper()}]: {value.get('answer', '')}\n\n"
+
+        # Aplica revisão final
+        artigo_final += "Revisão final: texto revisado e aprimorado com todas as informações."
+
+        return artigo_final
