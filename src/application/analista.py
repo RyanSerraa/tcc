@@ -1,5 +1,3 @@
-
-
 class Analista:
 
     def __init__(self, agente):

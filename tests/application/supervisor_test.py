@@ -31,9 +31,9 @@ def test_supervisor_choose_chain_yes():
             "query": "",
             "result": "",
             "answer": "",
-            'isAnalisis': False,
-            'isChart': False,
-            'isText': False,
+            "isAnalisis": False,
+            "isChart": False,
+            "isText": False,
         }
     )
 

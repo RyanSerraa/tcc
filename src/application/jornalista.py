@@ -1,5 +1,7 @@
 import json
+
 from src.domain.state import State
+
 
 class Jornalista:
     def __init__(self, agente):
@@ -45,13 +47,15 @@ class Jornalista:
             extra_body={"include_retrieval_info": True},
         )
 
-        resposta_texto = response.choices[0].message.content.strip() if response.choices else "{}"
+        resposta_texto = (
+            response.choices[0].message.content.strip() if response.choices else "{}"
+        )
         respostas = self.parse_resposta(resposta_texto)
 
         return {
             "isText": self.is_text(respostas),
             "isChart": self.is_chart(respostas),
-            "isAnalisis": self.is_analisis(respostas)
+            "isAnalisis": self.is_analisis(respostas),
         }
 
     def write_article(self, state: State):

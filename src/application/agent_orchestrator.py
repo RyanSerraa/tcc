@@ -25,7 +25,7 @@ class AgentManager:
         self.chart_editor = chart_editor_agent
         self.web_search = web_search_agent
         self.embeddings = embeddings
-        self.run_query = RunQuery(connection).run_query # type: ignore[attr-defined]
+        self.run_query = RunQuery(connection).run_query  # type: ignore[attr-defined]
         self.supervisor = supervisor_agent
         self.jornalista = jornalista_agent
         self.analista = analista_agent
@@ -36,18 +36,30 @@ class AgentManager:
     def _build_workflow(self):
         self.workflow.add_node(
             "supervisor",
-            lambda state: self.supervisor.choose_chain(state, self.embeddings, self.connection),
+            lambda state: self.supervisor.choose_chain(
+                state, self.embeddings, self.connection
+            ),
         )
         self.workflow.add_node("searchWeb", lambda state: self.web_search.search(state))
         self.workflow.add_node(
             "to_sql_query",
-            lambda state: self.text_to_sql.to_sql_query(state, self.embeddings, self.connection),
+            lambda state: self.text_to_sql.to_sql_query(
+                state, self.embeddings, self.connection
+            ),
         )
         self.workflow.add_node("run_query", lambda state: self.run_query(state))
-        self.workflow.add_node("respondWithChart", lambda state: self.chart_editor.respond(state))
-        self.workflow.add_node("respondWithText", lambda state: self.text_editor.respond(state))
-        self.workflow.add_node("jornalista", lambda state: self.jornalista.choose_chain(state))
-        self.workflow.add_node("analista", lambda state: self.analista.write_analysis(state))
+        self.workflow.add_node(
+            "respondWithChart", lambda state: self.chart_editor.respond(state)
+        )
+        self.workflow.add_node(
+            "respondWithText", lambda state: self.text_editor.respond(state)
+        )
+        self.workflow.add_node(
+            "jornalista", lambda state: self.jornalista.choose_chain(state)
+        )
+        self.workflow.add_node(
+            "analista", lambda state: self.analista.write_analysis(state)
+        )
 
         self.workflow.add_edge(START, "supervisor")
         self.workflow.add_conditional_edges(
@@ -72,14 +84,19 @@ class AgentManager:
                 if not state["agents_done"]["respondWithChart"]:
                     nodes.append("respondWithChart")
             else:
-                if self.jornalista.is_chart(state) and not state["agents_done"]["respondWithChart"]:
+                if (
+                    self.jornalista.is_chart(state)
+                    and not state["agents_done"]["respondWithChart"]
+                ):
                     nodes.append("respondWithChart")
-                if self.jornalista.is_text(state) and not state["agents_done"]["respondWithText"]:
+                if (
+                    self.jornalista.is_text(state)
+                    and not state["agents_done"]["respondWithText"]
+                ):
                     nodes.append("respondWithText")
 
             return nodes
 
-        
         self.workflow.add_conditional_edges("jornalista", next_nodes_from_jornalista)
 
         self.workflow.add_edge("analista", "jornalista")
@@ -92,6 +109,7 @@ class AgentManager:
 
     def hasChart(self, state: State):
         return "Yes" if "gráfico" in state.get("question", "").lower() else "No"
+
     def respond_text(self, state: State):
         state["agents_done"]["respondWithText"] = True
         return state
