@@ -10,4 +10,3 @@ class State(TypedDict):
     isText: bool
     isChart: bool
     isAnalisis: bool
-    agents_done: dict

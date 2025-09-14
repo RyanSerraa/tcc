@@ -29,9 +29,9 @@ class Config:
             os.getenv("SUPERVISOR_API_KEY"),
         )
 
-        self.jornalista = (
-            os.getenv("JORNALISTA_AGENT_ENDPOINT"),
-            os.getenv("JORNALISTA_API_KEY"),
+        self.gerente = (
+            os.getenv("GERENTE_AGENT_ENDPOINT"),
+            os.getenv("GERENTE_API_KEY"),
         )
 
         self.analista = (

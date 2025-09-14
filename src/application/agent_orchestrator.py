@@ -15,7 +15,7 @@ class AgentManager:
         chart_editor_agent,
         web_search_agent,
         supervisor_agent,
-        jornalista_agent,
+        gerente_agent,
         analista_agent,
         embeddings,
     ):
@@ -27,7 +27,7 @@ class AgentManager:
         self.embeddings = embeddings
         self.run_query = RunQuery(connection).run_query  # type: ignore[attr-defined]
         self.supervisor = supervisor_agent
-        self.jornalista = jornalista_agent
+        self.gerente = gerente_agent
         self.analista = analista_agent
         self.workflow = StateGraph(State)
         self._build_workflow()
@@ -55,7 +55,7 @@ class AgentManager:
             "respondWithText", lambda state: self.text_editor.respond(state)
         )
         self.workflow.add_node(
-            "jornalista", lambda state: self.jornalista.choose_chain(state)
+            "gerente", lambda state: self.gerente.choose_chain(state)
         )
         self.workflow.add_node(
             "analista", lambda state: self.analista.write_analysis(state)
@@ -68,40 +68,17 @@ class AgentManager:
             {"Yes": "to_sql_query", "No": "searchWeb"},
         )
         self.workflow.add_edge("to_sql_query", "run_query")
-        self.workflow.add_edge("run_query", "jornalista")
+        self.workflow.add_edge("run_query", "gerente")
+        self.workflow.add_conditional_edges(
+        "gerente",
+        self.next_after_gerente,
+        {
+            "chart_only": "respondWithChart",
+            "analysis": "analista",
+            "text": "respondWithText",
+        },
+)
 
-        def next_nodes_from_jornalista(state):
-            # Se todos os agentes terminaram, vai para END
-            if all(state["agents_done"].values()):
-                return [END]
-
-            nodes = []
-            if self.jornalista.is_analisis(state):
-                if not state["agents_done"]["analista"]:
-                    nodes.append("analista")
-                if not state["agents_done"]["respondWithText"]:
-                    nodes.append("respondWithText")
-                if not state["agents_done"]["respondWithChart"]:
-                    nodes.append("respondWithChart")
-            else:
-                if (
-                    self.jornalista.is_chart(state)
-                    and not state["agents_done"]["respondWithChart"]
-                ):
-                    nodes.append("respondWithChart")
-                if (
-                    self.jornalista.is_text(state)
-                    and not state["agents_done"]["respondWithText"]
-                ):
-                    nodes.append("respondWithText")
-
-            return nodes
-
-        self.workflow.add_conditional_edges("jornalista", next_nodes_from_jornalista)
-
-        self.workflow.add_edge("analista", "jornalista")
-        self.workflow.add_edge("respondWithText", "jornalista")
-        self.workflow.add_edge("respondWithChart", "jornalista")
         self.workflow.add_edge("searchWeb", END)
 
     def verifySupervisorAnswer(self, state: State):
@@ -110,14 +87,12 @@ class AgentManager:
     def hasChart(self, state: State):
         return "Yes" if "gráfico" in state.get("question", "").lower() else "No"
 
-    def respond_text(self, state: State):
-        state["agents_done"]["respondWithText"] = True
-        return state
+    def next_after_gerente(self, gerente_result):
+        if gerente_result["isAnalisis"] and gerente_result["isChart"]:
+            return ["analysis", "chart_only"]
+        if gerente_result["isChart"]:
+            return "chart_only"
+        if gerente_result["isAnalisis"]:
+            return "analysis"
+        return "text"
 
-    def respond_chart(self, state: State):
-        state["agents_done"]["respondWithChart"] = True
-        return state
-
-    def run_analista(self, state: State):
-        state["agents_done"]["analista"] = True
-        return state

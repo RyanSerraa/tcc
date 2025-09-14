@@ -6,7 +6,7 @@ from config.config import Config
 from src.application.agent_orchestrator import AgentManager
 from src.application.analista import Analista
 from src.application.chart_editor import ChartEditor
-from src.application.jornalista import Jornalista
+from src.application.gerente import Gerente
 from src.application.query_manager import QueryManager
 from src.application.supervisor import Supervisor
 from src.application.text_editor import TextEditor
@@ -40,7 +40,7 @@ class Main:
             )
             web_search_agent = WebSearch(Agents.load_agent(*self.config.web_search))
             supervisor_agent = Supervisor(Agents.load_agent(*self.config.supervisor))
-            jornalista_agent = Jornalista(Agents.load_agent(*self.config.jornalista))
+            gerente_agent = Gerente(Agents.load_agent(*self.config.gerente))
             analista_agent = Analista(Agents.load_agent(*self.config.analista))
             logging.info("Todos os agentes carregados com sucesso")
         except Exception as e:
@@ -70,7 +70,7 @@ class Main:
                 chart_editor_agent=chart_editor_agent,
                 web_search_agent=web_search_agent,
                 supervisor_agent=supervisor_agent,
-                jornalista_agent=jornalista_agent,
+                gerente_agent=gerente_agent,
                 analista_agent=analista_agent,
                 embeddings=embeddings,
             )
