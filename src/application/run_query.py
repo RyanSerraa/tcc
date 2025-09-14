@@ -1,13 +1,13 @@
 import re
 
 from psycopg2.extras import DictCursor
-
+from typing import Any
 
 class RunQuery:
     def __init__(self, connection):
         self.connection = connection
 
-    def run_query(self, sql_query: dict):
+def run_query(self, sql_query: dict[str, Any]) -> dict[str, Any]:
         try:
             with self.connection.cursor(cursor_factory=DictCursor) as cursor:
                 query = sql_query["query"].strip()

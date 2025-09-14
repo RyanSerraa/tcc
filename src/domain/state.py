@@ -7,3 +7,7 @@ class State(TypedDict):
     query: str
     result: str
     answer: str
+    isText: bool
+    isChart: bool
+    isAnalisis: bool
+    agents_done: dict
