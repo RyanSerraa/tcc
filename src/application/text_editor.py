@@ -6,7 +6,7 @@ class TextEditor:
         self.text_editor = agent
 
     def respond(self, state: State):
-        prompt = f"Pergunta: \"{state['question']}\".\nDados: \"{state['result']}\".\n"
+        prompt = f"Pergunta: \"{state['question']}\".\nDados: \"{state.get('result', [])}\".\n"
         response = self.text_editor.chat.completions.create(
             model="n/a",
             messages=[{"role": "user", "content": prompt}],
@@ -17,4 +17,6 @@ class TextEditor:
             if response.choices and hasattr(response.choices[0].message, "content")
             else ""
         )
-        return {"answer": answer}
+        # adiciona a resposta dentro do state
+        state["answer"] = answer
+        return state  # retorna o state completo

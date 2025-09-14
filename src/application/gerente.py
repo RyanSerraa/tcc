@@ -32,6 +32,7 @@ class Gerente:
 
     def choose_chain(self, state: State, embeddings, connection) -> dict:
         """Orquestra a chamada ao agente e processa as respostas."""
+        print("Gerente - Escolhendo cadeia com base na pergunta do usuário.")
         contexto = embeddings.getContext(state["question"], "gerente", connection)
         prompt = (
             f"Contexto relevante:\n{contexto}\n"
@@ -51,6 +52,7 @@ class Gerente:
             response.choices[0].message.content.strip() if response.choices else "{}"
         )
         respostas = self.parse_resposta(resposta_texto)
+        print(respostas)
 
         return {
             "isText": self.is_text(respostas),
