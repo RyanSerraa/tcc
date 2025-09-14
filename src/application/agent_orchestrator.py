@@ -70,13 +70,13 @@ class AgentManager:
         self.workflow.add_edge("to_sql_query", "run_query")
         self.workflow.add_edge("run_query", "gerente")
         self.workflow.add_conditional_edges(
-        "gerente",
-        self.next_after_gerente,
-        {
-            "chart_only": "respondWithChart",
-            "analysis": "analista",
-            "text": "respondWithText",
-        },
+            "gerente",
+            self.next_after_gerente,
+            {
+                "chart_only": "respondWithChart",
+                "analysis": "analista",
+                "text": "respondWithText",
+            },
         )
         # depois do bloco de conditional_edges do gerente
         self.workflow.add_edge("respondWithChart", END)

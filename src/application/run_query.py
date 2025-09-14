@@ -1,5 +1,4 @@
 import re
-from typing import Any
 
 from psycopg2.extras import DictCursor
 
@@ -7,7 +6,6 @@ from psycopg2.extras import DictCursor
 class RunQuery:
     def __init__(self, connection):
         self.connection = connection
-
 
     def run_query(self, state: dict) -> dict:
         print("Running query:", state.get("query"))
