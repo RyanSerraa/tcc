@@ -1,5 +1,7 @@
 import json
+
 import plotly.graph_objects as go
+
 from src.domain.state import State
 
 

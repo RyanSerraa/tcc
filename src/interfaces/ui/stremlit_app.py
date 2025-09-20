@@ -1,8 +1,8 @@
 import pandas as pd
 import streamlit as st
 
-from src.application.query_manager import QueryManager
 from src.application.chart_editor import ChartEditor
+from src.application.query_manager import QueryManager
 
 
 class Index:
