@@ -4,15 +4,15 @@ from typing import Any, Dict
 
 from config.config import Config
 from src.application.agent_orchestrator import AgentManager
+from src.application.analista import Analista
 from src.application.chart_editor import ChartEditor
+from src.application.gerente import Gerente
 from src.application.query_manager import QueryManager
+from src.application.redator import Redator
+from src.application.run_query import RunQuery
 from src.application.supervisor import Supervisor
 from src.application.text_editor import TextEditor
 from src.application.text_to_sql import TextToSQL
-from src.application.gerente import Gerente
-from src.application.analista import Analista
-from src.application.redator import Redator
-from src.application.run_query import RunQuery
 from src.application.web_search import WebSearch
 from src.infrastructure.ai_agents import Agents
 from src.infrastructure.db import db

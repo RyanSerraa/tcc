@@ -1,4 +1,5 @@
 from unittest.mock import MagicMock
+
 from src.application.redator import Redator
 from src.domain.state import State
 

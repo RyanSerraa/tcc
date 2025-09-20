@@ -1,6 +1,7 @@
 import re
 
 from psycopg2.extras import DictCursor
+
 from src.domain.state import State
 
 
