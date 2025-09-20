@@ -1,8 +1,8 @@
 import pandas as pd
 import streamlit as st
-import streamlit.components.v1 as components
 
 from src.application.query_manager import QueryManager
+from src.application.chart_editor import ChartEditor
 
 
 class Index:
@@ -467,20 +467,15 @@ class Index:
                             chart_response = (
                                 result.get("chart_response") or text_response
                             )
+                            print("Chart Response:", chart_response)
 
                             st.markdown("### 🔍 Resultado")
 
                             if isinstance(text_response, str):
                                 st.write(text_response)
 
-                            if isinstance(chart_response, str):
-                                if any(
-                                    tag in chart_response.lower()
-                                    for tag in ["<html", "<div", "<canvas", "<script"]
-                                ):
-                                    components.html(
-                                        chart_response, height=550, scrolling=True
-                                    )
+                            if isinstance(chart_response, dict):
+                                st.plotly_chart(ChartEditor.mountChart(chart_response))
 
                             # Botões de ação
                             col1, col2 = st.columns([1, 1])

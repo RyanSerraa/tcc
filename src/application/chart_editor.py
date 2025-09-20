@@ -1,3 +1,5 @@
+import json
+import plotly.graph_objects as go
 from src.domain.state import State
 
 
@@ -20,4 +22,78 @@ class ChartEditor:
             if response.choices and hasattr(response.choices[0].message, "content")
             else ""
         )
-        return {"chartEditor_response": content}
+        response_json = json.loads(content)
+        print("Chart Editor Response:", response_json)
+        return {"chartEditor_response": response_json}
+
+    @staticmethod
+    def mountChart(graph_json):
+        chart_type = graph_json.get("type", "bar").lower()
+        layout = graph_json.get("layout", {})
+        data = graph_json.get("data", [])
+        fig = None
+
+        if chart_type in ["bar"]:
+            fig = go.Figure()
+            for series in data:
+                fig.add_trace(
+                    go.Bar(
+                        x=series["x"],
+                        y=series["y"],
+                        name=series.get("name", ""),
+                        marker=series.get("marker", {}),
+                    )
+                )
+            if layout.get("barmode"):
+                fig.update_layout(barmode=layout.get("barmode"))
+        elif chart_type in ["line"]:
+            fig = go.Figure()
+            for series in data:
+                fig.add_trace(
+                    go.Scatter(
+                        x=series["x"],
+                        y=series["y"],
+                        mode="lines+markers",
+                        name=series.get("name", ""),
+                        line=series.get("line", {}),
+                        marker=series.get("marker", {}),
+                    )
+                )
+        elif chart_type in ["scatter"]:
+            fig = go.Figure()
+            for series in data:
+                fig.add_trace(
+                    go.Scatter(
+                        x=series["x"],
+                        y=series["y"],
+                        mode="markers",
+                        name=series.get("name", ""),
+                        marker=series.get("marker", {}),
+                    )
+                )
+        elif chart_type in ["pie"]:
+            series = data[0] if data else {}
+            fig = go.Figure(
+                go.Pie(
+                    labels=series.get("x", []),
+                    values=series.get("y", []),
+                    name=series.get("name", ""),
+                    marker=series.get("marker", {}),
+                )
+            )
+        if fig is not None:
+            fig.update_layout(
+                title=layout.get("title", ""),
+                xaxis_title=(
+                    layout.get("xaxis", {}).get("title", "")
+                    if chart_type not in ["pie"]
+                    else None
+                ),
+                yaxis_title=(
+                    layout.get("yaxis", {}).get("title", "")
+                    if chart_type not in ["pie"]
+                    else None
+                ),
+                legend=layout.get("legend", {}),
+            )
+        return fig
