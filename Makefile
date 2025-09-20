@@ -11,4 +11,4 @@ llm-install:
 	pip install -r requirements.txt
 
 llm-run:
-	streamlit run src/main.py
+	PYTHONPATH=. streamlit run src/main.py
