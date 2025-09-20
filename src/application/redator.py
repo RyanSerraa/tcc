@@ -24,5 +24,4 @@ class Redator:
             response.choices[0].message.content.strip() if response.choices else ""
         )
         response = json.loads(content)
-        print(f"Redator response: {response}")
         return {"redator_response": response}

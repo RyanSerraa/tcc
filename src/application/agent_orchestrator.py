@@ -110,7 +110,6 @@ class AgentManager:
         return outputs
 
     def verifyRedatorResponse(self, state: State):
-        # print(f"Verificando resposta do Redator: {state.get('redator_response')}")
         decision = state.redator_response
         if decision.get("redoChart") == True:
             return "refazerGrafico"

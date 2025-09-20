@@ -17,5 +17,4 @@ class Analista:
             if response.choices and hasattr(response.choices[0].message, "content")
             else ""
         )
-        print(f"Analista response: {content}")
         return {"analista_response": content}

@@ -18,5 +18,4 @@ class Gerente:
             response.choices[0].message.content.strip() if response.choices else ""
         )
         decision = json.loads(content)
-        print(f"Gerente decision: {decision}")
         return {"gerente_decision": decision}
