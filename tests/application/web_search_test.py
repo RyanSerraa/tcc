@@ -13,16 +13,19 @@ def test_web_search_respond():
     web_search = WebSearch(mock_agent)
 
     state = State(
-        {
-            "question": "Qual é a capital da Califórnia?",
-            "isEUA": True,
-            "query": "",
-            "result": "",
-            "answer": "",
-        }
+        question="Qual é a capital da Califórnia?",
+        isEUA=True,
+        query="",
+        result="",
+        gerente_decision={},
+        textEditor_response="",
+        chartEditor_response="",
+        analista_response="",
+        searchWeb_response="",
+        redator_response={},
     )
 
     result = web_search.search(state)
 
-    assert result["answer"] == "Resposta simulada"
+    assert result["searchWeb_response"] == "Resposta simulada"
     mock_agent.chat.completions.create.assert_called_once()

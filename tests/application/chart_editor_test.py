@@ -13,16 +13,19 @@ def test_chart_editor_respond():
     chart_editor = ChartEditor(mock_agent)
 
     state = State(
-        {
-            "question": "Qual é a população da Califórnia?",
-            "isEUA": True,
-            "query": "",
-            "result": "População: 39 milhões",
-            "answer": "",
-        }
+        question="Qual é a capital da Califórnia?",
+        isEUA=True,
+        query="",
+        result="",
+        gerente_decision={},
+        textEditor_response="",
+        chartEditor_response="",
+        analista_response="",
+        searchWeb_response="",
+        redator_response={},
     )
 
     result = chart_editor.respond(state)
 
-    assert result["answer"] == "Resposta simulada"
+    assert result["chartEditor_response"] == "Resposta simulada"
     mock_agent.chat.completions.create.assert_called_once()

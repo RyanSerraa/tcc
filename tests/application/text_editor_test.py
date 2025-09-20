@@ -14,16 +14,19 @@ def test_text_editor_respond():
     text_editor = TextEditor(mock_agent)
 
     state = State(
-        {
-            "question": "Qual é a capital da Califórnia?",
-            "isEUA": True,
-            "query": "",
-            "result": "População: 39 milhões",
-            "answer": "",
-        }
+        question="Qual é a capital da Califórnia?",
+        isEUA=True,
+        query="",
+        result="",
+        gerente_decision={},
+        textEditor_response="",
+        chartEditor_response="",
+        analista_response="",
+        searchWeb_response="",
+        redator_response={},
     )
 
     result = text_editor.respond(state)
 
-    assert result["answer"] == "Resposta simulada"
+    assert result["textEditor_response"] == "Resposta simulada"
     mock_agent.chat.completions.create.assert_called_once()
