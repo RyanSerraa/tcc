@@ -2,7 +2,6 @@ from unittest.mock import MagicMock
 
 from src.application.gerente import Gerente
 from src.domain.state import State
-import json
 
 
 def test_gerente_respond():

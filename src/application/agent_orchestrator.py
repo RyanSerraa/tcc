@@ -111,7 +111,7 @@ class AgentManager:
 
     def verifyRedatorResponse(self, state: State):
         decision = state.redator_response
-        if decision.get("redoChart") == True:
+        if decision.get("redoChart"):
             return "refazerGrafico"
 
         return None

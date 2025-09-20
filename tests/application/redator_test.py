@@ -1,5 +1,4 @@
 from unittest.mock import MagicMock
-import json
 from src.application.redator import Redator
 from src.domain.state import State
 

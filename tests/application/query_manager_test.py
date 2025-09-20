@@ -1,7 +1,6 @@
 from unittest.mock import MagicMock
 
 from src.application.query_manager import QueryManager
-from src.domain.state import State
 
 
 def test_consultar_dados_sucesso():
