@@ -18,7 +18,7 @@ class Index:
         schema_text = self.schema_text
         schema_dados = self.schema_dados
         st.set_page_config(
-            page_title="Text-to-SQL Converter",
+            page_title="CrimeFlow",
             page_icon=":database:",
             layout="wide",
             initial_sidebar_state="expanded",
@@ -364,7 +364,7 @@ class Index:
                     )
 
                 with st.expander(
-                    "💥 Confrontos Fatais (VConfrontosFatais)", expanded=False
+                    "💥 Confrontos Fatais (VConfrontoFatal)", expanded=False
                 ):
                     st.caption(
                         "Casos em que uma pessoa morreu em confronto com a polícia."
@@ -461,33 +461,44 @@ class Index:
                         try:
                             result = self.query_manager.consultar_dados(query)
 
-                            answer = result.get("answer") or result.get("result")
+                            text_response = result.get("text_response") or result.get(
+                                "result"
+                            )
+                            chart_response = (
+                                result.get("chart_response") or text_response
+                            )
 
                             st.markdown("### 🔍 Resultado")
 
-                            if isinstance(answer, str):
+                            if isinstance(text_response, str):
+                                st.write(text_response)
+
+                            if isinstance(chart_response, str):
                                 if any(
-                                    tag in answer.lower()
+                                    tag in chart_response.lower()
                                     for tag in ["<html", "<div", "<canvas", "<script"]
                                 ):
-                                    components.html(answer, height=500, scrolling=True)
-                                else:
-                                    st.write(answer)
-                            else:
-                                st.write(answer)
+                                    components.html(
+                                        chart_response, height=550, scrolling=True
+                                    )
 
                             # Botões de ação
                             col1, col2 = st.columns([1, 1])
                             with col1:
                                 st.download_button(
                                     label="📥 Baixar Resposta",
-                                    data=str(answer),
+                                    data=str(
+                                        {
+                                            "text_response": text_response,
+                                            "chart_response": chart_response,
+                                        }
+                                    ),
                                     file_name="response_generated.txt",
                                     mime="text/plain",
                                 )
                             with col2:
                                 if st.button("🔄 Gerar Novamente"):
-                                    st.experimental_rerun()
+                                    st.session_state.clear()
 
                         except Exception as e:
                             st.error(f"⚠️ Ocorreu um erro ao gerar a resposta: {str(e)}")
