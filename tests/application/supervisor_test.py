@@ -25,13 +25,16 @@ def test_supervisor_choose_chain_yes():
         supervisor = Supervisor(mock_agent)
 
     state = State(
-        {
-            "question": "Finance department question",
-            "isEUA": False,
-            "query": "",
-            "result": "",
-            "answer": "",
-        }
+        question="Qual é a capital da Califórnia?",
+        isEUA=True,
+        query="",
+        result="",
+        gerente_decision={},
+        textEditor_response="",
+        chartEditor_response="",
+        analista_response="",
+        searchWeb_response="",
+        redator_response={},
     )
 
     result = supervisor.choose_chain(state, mock_embeddings, None)
@@ -39,5 +42,5 @@ def test_supervisor_choose_chain_yes():
     assert result["isEUA"] is True
     mock_agent.chat.completions.create.assert_called_once()
     mock_embeddings.getContext.assert_called_once_with(
-        state["question"], "supervisor", None
+        state.question, "supervisor", None
     )

@@ -12,6 +12,9 @@ venv/
 ENV/
 env/
 *.env
+*.pub
+*.png
+tcc-crime-flow
 
 # Python virtual environment tools
 pip-log.txt

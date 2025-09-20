@@ -11,12 +11,12 @@ class Supervisor:
         )
 
     def choose_chain(self, state: State, embeddings, connection):
-        question = state["question"].lower()
+        question = state.question.lower()
         hasFoundDept = any(dep.lower() in question for dep in self.departamentos_set)
-        contexto = embeddings.getContext(state["question"], "supervisor", connection)
+        contexto = embeddings.getContext(state.question, "supervisor", connection)
         prompt = (
             f"Contexto relevante:\n{contexto}\n"
-            f'Pergunta do usuário: "{state["question"]}".\n'
+            f'Pergunta do usuário: "{state.question}".\n'
             f"temDepartamentoEncontrado: {hasFoundDept}"
         )
         response = self.supervisor_agent.chat.completions.create(

@@ -4,8 +4,12 @@ from typing import Any, Dict
 
 from config.config import Config
 from src.application.agent_orchestrator import AgentManager
+from src.application.analista import Analista
 from src.application.chart_editor import ChartEditor
+from src.application.gerente import Gerente
 from src.application.query_manager import QueryManager
+from src.application.redator import Redator
+from src.application.run_query import RunQuery
 from src.application.supervisor import Supervisor
 from src.application.text_editor import TextEditor
 from src.application.text_to_sql import TextToSQL
@@ -38,6 +42,10 @@ class Main:
             )
             web_search_agent = WebSearch(Agents.load_agent(*self.config.web_search))
             supervisor_agent = Supervisor(Agents.load_agent(*self.config.supervisor))
+            gerente_agent = Gerente(Agents.load_agent(*self.config.gerente))
+            analista_agent = Analista(Agents.load_agent(*self.config.analista))
+            redator_agent = Redator(Agents.load_agent(*self.config.redator))
+
             logging.info("Todos os agentes carregados com sucesso")
         except Exception as e:
             logging.error(f"Erro ao carregar agentes: {e}", exc_info=True)
@@ -59,6 +67,7 @@ class Main:
                     "Database URL (db_url) is not set in the configuration."
                 )
             connection = db().get_connection(self.config.db_url)
+            run_query_agent = RunQuery(connection)
             agent_manager = AgentManager(
                 connection=connection,
                 text_to_sql_agent=text_to_sql_agent,
@@ -67,6 +76,10 @@ class Main:
                 web_search_agent=web_search_agent,
                 supervisor_agent=supervisor_agent,
                 embeddings=embeddings,
+                gerente_agent=gerente_agent,
+                run_query_agent=run_query_agent,
+                analista_agent=analista_agent,
+                redator_agent=redator_agent,
             )
 
             query_manager = QueryManager(agent_manager=agent_manager)

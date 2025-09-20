@@ -1,4 +1,3 @@
-
 from src.domain.state import State
 
 
@@ -7,9 +6,10 @@ class TextToSQL:
         self.text_to_sql = agente
 
     def to_sql_query(self, state: State, embeddings, connection):
-        cleanedQuestion = state["question"].replace(" em gráfico", "")
-        contexto = embeddings.getContext(state["question"], "text_to_sql", connection)
-        final_prompt = f"Pergunta do usuario:\n{cleanedQuestion}\n\nContexto relevante:\n{contexto}"
+        contexto = embeddings.getContext(state.question, "text_to_sql", connection)
+        final_prompt = (
+            f"Pergunta do usuario:\n{state.question}\n\nContexto relevante:\n{contexto}"
+        )
         response = self.text_to_sql.chat.completions.create(
             model="n/a",
             messages=[{"role": "user", "content": final_prompt}],

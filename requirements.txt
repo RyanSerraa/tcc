@@ -14,3 +14,4 @@ ruff
 isort
 black
 numpy==1.26.4
+pytest-cov

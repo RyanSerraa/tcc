@@ -1,16 +1,16 @@
 from unittest.mock import MagicMock
 
-from src.application.chart_editor import ChartEditor
+from src.application.analista import Analista
 from src.domain.state import State
 
 
-def test_chart_editor_respond():
+def test_analista_respond():
     mock_agent = MagicMock()
     mock_agent.chat.completions.create.return_value.choices = [
         MagicMock(message=MagicMock(content="Resposta simulada"))
     ]
 
-    chart_editor = ChartEditor(mock_agent)
+    analista = Analista(mock_agent)
 
     state = State(
         question="Qual é a capital da Califórnia?",
@@ -25,7 +25,7 @@ def test_chart_editor_respond():
         redator_response={},
     )
 
-    result = chart_editor.respond(state)
+    result = analista.respond(state)
 
-    assert result["chartEditor_response"] == "Resposta simulada"
+    assert result["analista_response"] == "Resposta simulada"
     mock_agent.chat.completions.create.assert_called_once()

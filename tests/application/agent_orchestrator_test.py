@@ -18,6 +18,10 @@ def mock_agents():
         "supervisor_agent": Mock(),
         "embeddings": Mock(),
         "connection": Mock(),
+        "gerente_agent": Mock(),
+        "run_query_agent": Mock(),
+        "analista_agent": Mock(),
+        "redator_agent": Mock(),
     }
 
 
@@ -31,35 +35,43 @@ def agent_manager(mock_agents):
         web_search_agent=mock_agents["web_search_agent"],
         supervisor_agent=mock_agents["supervisor_agent"],
         embeddings=mock_agents["embeddings"],
+        gerente_agent=mock_agents["gerente_agent"],
+        run_query_agent=mock_agents["run_query_agent"],
+        analista_agent=mock_agents["analista_agent"],
+        redator_agent=mock_agents["redator_agent"],
     )
 
 
 def test_verifySupervisorAnswer_yes(agent_manager):
-    state = State({"isEUA": True})
-    assert agent_manager.verifySupervisorAnswer(state) == "Yes"
+    state = State(
+        question="Qual é a capital da Califórnia?",
+        isEUA=True,
+        query="",
+        result="",
+        gerente_decision={},
+        textEditor_response="",
+        chartEditor_response="",
+        analista_response="",
+        searchWeb_response="",
+        redator_response={},
+    )
+    assert agent_manager.verifySupervisorResponse(state) == "Sim"
 
 
 def test_verifySupervisorAnswer_no(agent_manager):
-    state = State({"isEUA": False})
-    assert agent_manager.verifySupervisorAnswer(state) == "No"
-
-
-def test_hasChart_yes(agent_manager):
     state = State(
-        {
-            "question": "Pode gerar um gráfico com a principal causa de morte na california em encontros fatais?",
-            "isEUA": True,
-            "query": "",
-            "result": "",
-            "answer": "",
-        }
+        question="Qual é a capital da Califórnia?",
+        isEUA=False,
+        query="",
+        result="",
+        gerente_decision={},
+        textEditor_response="",
+        chartEditor_response="",
+        analista_response="",
+        searchWeb_response="",
+        redator_response={},
     )
-    assert agent_manager.hasChart(state) == "Yes"
-
-
-def test_hasChart_no(agent_manager):
-    state = State({"question": "Qual é a previsão do tempo?"})
-    assert agent_manager.hasChart(state) == "No"
+    assert agent_manager.verifySupervisorResponse(state) == "Não"
 
 
 def test_workflow_nodes_exist(agent_manager):
@@ -69,8 +81,11 @@ def test_workflow_nodes_exist(agent_manager):
         "searchWeb",
         "to_sql_query",
         "run_query",
-        "respondWithChart",
-        "respondWithText",
+        "textEditor",
+        "chartEditor",
+        "analista",
+        "redator",
+        "gerente",
     ]
     for node in expected_nodes:
         assert node in nodes
@@ -80,5 +95,26 @@ def test_workflow_edges_exist(agent_manager):
     edges = agent_manager.workflow.edges
     edge_list = [(from_node, to_node) for from_node, to_node in edges]
     assert ("__start__", "supervisor") in edge_list
-    assert ("respondWithText", "__end__") in edge_list
-    assert ("respondWithChart", "__end__") in edge_list
+    assert ("searchWeb", "__end__") in edge_list
+    # Note: redator has conditional edges, not direct edges to __end__
+
+
+def test_redator_conditional_edge_logic(agent_manager):
+    # Test when redoChart is True - should go to chartEditor
+    state_redo_chart = State(
+        question="Test question", redator_response={"redoChart": True}
+    )
+    result = agent_manager.verifyRedatorResponse(state_redo_chart)
+    assert result == "refazerGrafico"
+
+    # Test when redoChart is False/None - should go to END
+    state_no_redo = State(
+        question="Test question", redator_response={"redoChart": False}
+    )
+    result = agent_manager.verifyRedatorResponse(state_no_redo)
+    assert result is None
+
+    # Test when redator_response is empty
+    state_empty = State(question="Test question", redator_response={})
+    result = agent_manager.verifyRedatorResponse(state_empty)
+    assert result is None

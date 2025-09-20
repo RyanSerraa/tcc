@@ -1,16 +1,19 @@
 from unittest.mock import MagicMock
 
-from src.application.chart_editor import ChartEditor
+from src.application.gerente import Gerente
 from src.domain.state import State
 
 
-def test_chart_editor_respond():
+def test_gerente_respond():
     mock_agent = MagicMock()
+    mock_response_json = (
+        '{"textEditor": "Sim", "chartEditor": "Não", "analista": "Sim"}'
+    )
     mock_agent.chat.completions.create.return_value.choices = [
-        MagicMock(message=MagicMock(content="Resposta simulada"))
+        MagicMock(message=MagicMock(content=mock_response_json))
     ]
 
-    chart_editor = ChartEditor(mock_agent)
+    gerente = Gerente(mock_agent)
 
     state = State(
         question="Qual é a capital da Califórnia?",
@@ -25,7 +28,12 @@ def test_chart_editor_respond():
         redator_response={},
     )
 
-    result = chart_editor.respond(state)
+    result = gerente.choose_chain(state)
+    expected_response = {
+        "textEditor": "Sim",
+        "chartEditor": "Não",
+        "analista": "Sim",
+    }
 
-    assert result["chartEditor_response"] == "Resposta simulada"
+    assert result["gerente_decision"] == expected_response
     mock_agent.chat.completions.create.assert_called_once()
