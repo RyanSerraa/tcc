@@ -419,9 +419,7 @@ class Index:
                 <div class="feature-card">
                     <h4>💡 Seja específico</h4>
                     <ul>
-                        <li>Peça a resposta <code>em texto</code> ou <code>em gráfico</code>.</li>
-                        <li>Para gráficos, adicione <code>- em gráfico</code> no final da pergunta.</li>
-                        <li>Se os resultados forem poucos, prefira a resposta textual.</li>
+                        <li>Se não souber o que perguntar, consulte o esquema atual. Ele oferece uma visão geral do sistema e poderá orientar a formulação de perguntas mais precisas, permitindo que o modelo forneça respostas mais adequadas.</li>
                     </ul>
                 </div>
 
@@ -429,8 +427,8 @@ class Index:
                     <h4>📝 Exemplos de consultas</h4>
                     <ul>
                         <li><b>Texto:</b> Qual é a principal causa de morte na Califórnia em confrontos fatais?</li>
-                        <li><b>Gráfico:</b> Qual é a top 10 principais causas de morte na Califórnia em confrontos fatais? <code>- em gráfico</code></li>
-                        <li><b>Gráfico específico:</b> Qual é a top 10 principais causas de morte na Califórnia em confrontos fatais? <code>- em gráfico de barras</code></li>
+                        <li><b>Gráfico:</b> Forneça um gráfico que mostre as 10 principais causas de morte em confrontos fatais na Califórnia</li>
+                        <li><b>Gráfico específico:</b> Em gráfico de barras, qual é a top 10 principais causas de morte na Califórnia em confrontos fatais?</li>
                     </ul>
                 </div>
                 """,
@@ -503,8 +501,8 @@ class Index:
         st.markdown(
             """
             <div style="text-align: center; color: #94a3b8; font-size: 14px; margin-top: 2rem;">
-                <p>CrimeFlow v2.0 • Desenvolvido com I.A. e LangChain</p>
-                <p style="font-size: 0.8rem;">© 2023 Todos os direitos reservados</p>
+                <p>CrimeFlow v1.0 • Desenvolvido por Daniel e Ryan</p>
+                <p style="font-size: 0.8rem;">© 2025 Todos os direitos reservados</p>
             </div>
         """,
             unsafe_allow_html=True,
