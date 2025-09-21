@@ -6,8 +6,9 @@ from src.domain.state import State
 
 def test_chart_editor_respond():
     mock_agent = MagicMock()
+    mock_responnse_json = '{ "teste": "valor" }'
     mock_agent.chat.completions.create.return_value.choices = [
-        MagicMock(message=MagicMock(content="Resposta simulada"))
+        MagicMock(message=MagicMock(content=mock_responnse_json))
     ]
 
     chart_editor = ChartEditor(mock_agent)
@@ -26,6 +27,7 @@ def test_chart_editor_respond():
     )
 
     result = chart_editor.respond(state)
+    expected_response = {"teste": "valor"}
 
-    assert result["chartEditor_response"] == "Resposta simulada"
+    assert result["chartEditor_response"] == expected_response
     mock_agent.chat.completions.create.assert_called_once()
