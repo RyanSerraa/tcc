@@ -66,6 +66,8 @@ instance/
 *.db
 *.db-journal
 
+.ruff_cache/
+
 # MacOS
 .DS_Store
 
