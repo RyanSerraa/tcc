@@ -460,7 +460,7 @@ class Index:
                             result = self.query_manager.consultar_dados(query)
 
                             text_response = result.get("text_response") or result.get(
-                                "result"
+                                "web_search_response"
                             )
                             chart_response = (
                                 result.get("chart_response") or text_response
