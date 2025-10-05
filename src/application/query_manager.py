@@ -15,7 +15,7 @@ class QueryManager:
             return {
                 "success": True,
                 "text_response": result.get("redator_response", {}).get(
-                    "final_textual_response" or result.get("web_search_response")
+                    "final_textual_response" or result.get("searchWeb_response")
                 ),
                 "chart_response": result.get("redator_response", {}).get("chart")
                 or result.get("result"),
