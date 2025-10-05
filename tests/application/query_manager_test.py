@@ -23,6 +23,7 @@ def test_consultar_dados_sucesso():
     assert result == {
         "success": True,
         "text_response": "Resultado simulado",
+        "web_search_response": None,
         "chart_response": None,
     }
     mock_agent_manager.chain.invoke.assert_called_once()
