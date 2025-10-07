@@ -1,17 +1,19 @@
+import torch
 from langchain_huggingface import HuggingFaceEmbeddings
 from psycopg2.extras import DictCursor, Json
-import torch
 
 
 class Embeddings:
     def __init__(self):
         if torch.cuda.is_available():
             self.embeddings_model = HuggingFaceEmbeddings(
-                model_name="sentence-transformers/all-MiniLM-L6-v2", model_kwargs={"device": "cuda", "trust_remote_code": True}
+                model_name="sentence-transformers/all-MiniLM-L6-v2",
+                model_kwargs={"device": "cuda", "trust_remote_code": True},
             )
         else:
             self.embeddings_model = HuggingFaceEmbeddings(
-                model_name="sentence-transformers/all-MiniLM-L6-v2", model_kwargs={"device": "cpu", "trust_remote_code": True}     
+                model_name="sentence-transformers/all-MiniLM-L6-v2",
+                model_kwargs={"device": "cpu", "trust_remote_code": True},
             )
 
     def embed_query(self, question: str):
