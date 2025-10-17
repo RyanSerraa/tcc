@@ -353,7 +353,7 @@ class Index:
                     st.markdown(
                         """
                     - 📅 **Data da morte** → Quando o policial morreu (Ex: 2015-09-11)
-                    - ⚰️ **Causa da morte** → Causa da morte dos policiais (Ex: Acidente, incêndio, esfaqeuado, etc)
+                    - ⚰️ **Causa da morte** → Causa da morte dos policiais (Ex: Acidente, incêndio, esfaqueado, etc)
                     - 🏢 **Departamento policial**
                     - 👮 **Tipo** → Sempre "POLICIAL"
                     - 🗺️ **Localização** → Estado, Cidade, Latitude, Longitude
