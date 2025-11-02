@@ -31,4 +31,4 @@ class Supervisor:
         resposta_texto = (
             response.choices[0].message.content.strip() if response.choices else ""
         )
-        return {"isEUA": resposta_texto.lower() == "sim"}
+        return {"isEUA": resposta_texto.lower() == "yes"}
