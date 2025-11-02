@@ -1,32 +1,33 @@
 from unittest.mock import MagicMock
 
-from src.application.text_editor import TextEditor
+from src.application.insight_drawer import InsightDrawer
 from src.domain.state import State
 
 
-def test_text_editor_respond():
-    # Mock do agente
+def test_chart_editor_respond():
     mock_agent = MagicMock()
+    mock_responnse_json = '{ "teste": "valor" }'
     mock_agent.chat.completions.create.return_value.choices = [
-        MagicMock(message=MagicMock(content="Resposta simulada"))
+        MagicMock(message=MagicMock(content=mock_responnse_json))
     ]
 
-    text_editor = TextEditor(mock_agent)
+    insight_drawer = InsightDrawer(mock_agent)
 
     state = State(
         question="Qual é a capital da Califórnia?",
         isEUA=True,
         query="",
         result="",
-        gerente_decision={},
+        manager_decision={},
         textEditor_response="",
         chartEditor_response="",
         analista_response="",
-        searchWeb_response="",
+        web_researcher_response="",
         redator_response={},
     )
 
-    result = text_editor.respond(state)
+    result = insight_drawer.respond(state)
+    expected_response = {"teste": "valor"}
 
-    assert result["textEditor_response"] == "Resposta simulada"
+    assert result["chartEditor_response"] == expected_response
     mock_agent.chat.completions.create.assert_called_once()

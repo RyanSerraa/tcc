@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock
 
-from src.application.query_manager import QueryManager
+from src.application.session_manager import SessionManager
 
 
 def test_consultar_dados_sucesso():
@@ -11,11 +11,11 @@ def test_consultar_dados_sucesso():
             "final_textual_response": "Resultado simulado",
             "chart": None,
         },
-        "web_search_response": None,
+        "web_researcher_response": None,
         "result": None,
     }
 
-    qm = QueryManager(mock_agent_manager)
+    qm = SessionManager(mock_agent_manager)
     result = qm.consultar_dados(
         "Qual a principal causa de morte por arma de fogo na Califórnia?"
     )
@@ -23,7 +23,7 @@ def test_consultar_dados_sucesso():
     assert result == {
         "success": True,
         "text_response": "Resultado simulado",
-        "web_search_response": None,
+        "web_researcher_response": None,
         "chart_response": None,
     }
     mock_agent_manager.chain.invoke.assert_called_once()
@@ -39,7 +39,7 @@ def test_consultar_dados_erro():
     mock_agent_manager = MagicMock()
     mock_agent_manager.chain.invoke.side_effect = Exception("Falha na chain")
 
-    qm = QueryManager(mock_agent_manager)
+    qm = SessionManager(mock_agent_manager)
     result = qm.consultar_dados("Pergunta qualquer")
 
     assert result == {"success": False, "error": "Falha na chain"}

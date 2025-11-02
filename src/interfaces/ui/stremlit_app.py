@@ -1,22 +1,24 @@
-import pandas as pd
 import streamlit as st
 
-from src.application.chart_editor import ChartEditor
-from src.application.query_manager import QueryManager
+from src.application.insight_drawer import InsightDrawer
+from src.application.session_manager import SessionManager
 
 
 class Index:
 
     def __init__(
-        self, query_manager: QueryManager, schema_text: str, schema_dados: dict
+        self,
+        query_manager: SessionManager,
+        schema_text: str,
+        exemplary_data: dict,
     ):
         self.query_manager = query_manager
         self.schema_text = schema_text
-        self.schema_dados = schema_dados
+        self.exemplary_data = exemplary_data
 
     def render(self):
         schema_text = self.schema_text
-        schema_dados = self.schema_dados
+        exemplary_data = self.exemplary_data
         st.set_page_config(
             page_title="CrimeFlow",
             page_icon=":database:",
@@ -328,7 +330,7 @@ class Index:
                     - 🗺️ **Localização** → Estado, Cidade, Latitude, Longitude
                     """
                     )
-                    st.code(pd.DataFrame(schema_dados["vPrisao"]), language="python")
+                    st.dataframe(exemplary_data["vPrisao"], width="stretch", height=100)
 
                 with st.expander("⚖️ Crimes (VCrime)", expanded=False):
                     st.caption("Informações gerais sobre crimes registrados.")
@@ -344,7 +346,7 @@ class Index:
                     - 🗺️ **Localização** → Estado, Cidade, Latitude, Longitude
                     """
                     )
-                    st.code(pd.DataFrame(schema_dados["vCrime"]), language="python")
+                    st.dataframe(exemplary_data["vCrime"], width="stretch", height=100)
 
                 with st.expander(
                     "👮 Mortes de Policiais (VMortePolicial)", expanded=False
@@ -359,8 +361,10 @@ class Index:
                     - 🗺️ **Localização** → Estado, Cidade, Latitude, Longitude
                     """
                     )
-                    st.code(
-                        pd.DataFrame(schema_dados["vMortePolicial"]), language="python"
+                    st.dataframe(
+                        exemplary_data["vMortePolicial"],
+                        width="stretch",
+                        height=100,
                     )
 
                 with st.expander(
@@ -385,8 +389,10 @@ class Index:
                     - 🗺️ **Localização** → Estado, Cidade, Latitude, Longitude
                     """
                     )
-                    st.code(
-                        pd.DataFrame(schema_dados["vConfrontoFatal"]), language="python"
+                    st.dataframe(
+                        exemplary_data["vConfrontoFatal"],
+                        width="stretch",
+                        height=100,
                     )
 
                 with st.expander("🔫 Tiroteios (VTiroteio)", expanded=False):
@@ -408,9 +414,13 @@ class Index:
                     - 🗺️ **Localização** → Estado, Cidade, Latitude, Longitude
                     """
                     )
-                    st.code(pd.DataFrame(schema_dados["vTiroteio"]), language="python")
+                    st.dataframe(
+                        exemplary_data["vTiroteio"],
+                        width="stretch",
+                        height=100,
+                    )
 
-                with st.expander("📜 Ver schema técnico (SQL)", expanded=False):
+                with st.expander("📜 Ver schema(SQL)", expanded=False):
                     st.code(schema_text, language="sql")
 
             st.markdown("### 📌 Dicas")
@@ -419,7 +429,7 @@ class Index:
                 <div class="feature-card">
                     <h4>💡 Seja específico</h4>
                     <ul>
-                        <li>Se não souber o que perguntar, consulte o esquema atual. Ele oferece uma visão geral do sistema e poderá orientar a formulação de perguntas mais precisas, permitindo que o modelo forneça respostas mais adequadas.</li>
+                        <li>Se não souber o que perguntar, consulte o Schema Atual. Ele oferece uma visão geral do sistema e poderá orientar a formulação de perguntas mais precisas, permitindo que o modelo forneça respostas mais adequadas.</li>
                     </ul>
                 </div>
 
@@ -460,12 +470,11 @@ class Index:
                             result = self.query_manager.consultar_dados(query)
 
                             text_response = result.get("text_response") or result.get(
-                                "web_search_response"
+                                "web_researcher_response"
                             )
                             chart_response = (
                                 result.get("chart_response") or text_response
                             )
-                            print("Chart Response:", chart_response)
 
                             st.markdown("### 🔍 Resultado")
 
@@ -473,7 +482,9 @@ class Index:
                                 st.write(text_response)
 
                             if isinstance(chart_response, dict):
-                                st.plotly_chart(ChartEditor.mountChart(chart_response))
+                                st.plotly_chart(
+                                    InsightDrawer.mountChart(chart_response)
+                                )
 
                             # Botões de ação
                             col1, col2 = st.columns([1, 1])

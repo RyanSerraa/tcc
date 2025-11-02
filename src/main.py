@@ -1,21 +1,21 @@
 import json
 import logging
-from typing import Any, Dict
+from typing import Any
 
 from config.config import Config
 from src.application.agent_orchestrator import AgentManager
-from src.application.analista import Analista
-from src.application.chart_editor import ChartEditor
-from src.application.gerente import Gerente
-from src.application.query_manager import QueryManager
-from src.application.redator import Redator
+from src.application.insight_drawer import InsightDrawer
+from src.application.insight_editor import InsightEditor
+from src.application.insight_reasoner import InsightReasoner
+from src.application.insight_writer import InsightWriter
+from src.application.manager import Manager
 from src.application.run_query import RunQuery
+from src.application.session_manager import SessionManager
 from src.application.supervisor import Supervisor
-from src.application.text_editor import TextEditor
 from src.application.text_to_sql import TextToSQL
-from src.application.web_search import WebSearch
+from src.application.web_researcher import WebResearcher
 from src.infrastructure.ai_agents import Agents
-from src.infrastructure.db import db
+from src.infrastructure.db import DB
 from src.infrastructure.embeddings import Embeddings
 from src.interfaces.ui.stremlit_app import Index
 
@@ -33,18 +33,25 @@ class Main:
             return f.read()
 
     def run(self):
-        # Carregar agentes
         try:
             text_to_sql_agent = TextToSQL(Agents.load_agent(*self.config.text_to_sql))
-            text_editor_agent = TextEditor(Agents.load_agent(*self.config.text_editor))
-            chart_editor_agent = ChartEditor(
-                Agents.load_agent(*self.config.chart_editor)
+            insight_writer_agent = InsightWriter(
+                Agents.load_agent(*self.config.insight_writer)
             )
-            web_search_agent = WebSearch(Agents.load_agent(*self.config.web_search))
+            insight_drawer_agent = InsightDrawer(
+                Agents.load_agent(*self.config.insight_drawer)
+            )
+            web_researcher_agent = WebResearcher(
+                Agents.load_agent(*self.config.web_researcher)
+            )
             supervisor_agent = Supervisor(Agents.load_agent(*self.config.supervisor))
-            gerente_agent = Gerente(Agents.load_agent(*self.config.gerente))
-            analista_agent = Analista(Agents.load_agent(*self.config.analista))
-            redator_agent = Redator(Agents.load_agent(*self.config.redator))
+            manager_agent = Manager(Agents.load_agent(*self.config.manager))
+            insight_reasoner_agent = InsightReasoner(
+                Agents.load_agent(*self.config.insight_reasoner)
+            )
+            insight_editor_agent = InsightEditor(
+                Agents.load_agent(*self.config.insight_editor)
+            )
 
             logging.info("Todos os agentes carregados com sucesso")
         except Exception as e:
@@ -52,49 +59,35 @@ class Main:
             return
 
         schema_text: str = self.load_file("src/resources/schema.txt")
-        schema_dados: Dict[str, Any] = self.load_file(
-            "src/resources/schema_dados.json", type="json"
+
+        embeddings = Embeddings()
+        if self.config.db_url is None:
+            logging.error("Database URL is not configured.")
+            return
+        db = DB(self.config.db_url)
+        exemplary_data = db.getExemplaryData()
+        run_query_agent = RunQuery(db)
+        agent_manager = AgentManager(
+            db=db,
+            text_to_sql_agent=text_to_sql_agent,
+            insight_writer_agent=insight_writer_agent,
+            insight_drawer_agent=insight_drawer_agent,
+            web_researcher_agent=web_researcher_agent,
+            supervisor_agent=supervisor_agent,
+            embeddings=embeddings,
+            manager_agent=manager_agent,
+            run_query_agent=run_query_agent,
+            insight_reasoner_agent=insight_reasoner_agent,
+            insight_editor_agent=insight_editor_agent,
         )
 
-        # Inicializar embeddings
-        embeddings = Embeddings()
-
-        # Conectar ao banco e criar managers
-        connection = None
-        try:
-            if self.config.db_url is None:
-                raise ValueError(
-                    "Database URL (db_url) is not set in the configuration."
-                )
-            connection = db().get_connection(self.config.db_url)
-            run_query_agent = RunQuery(connection)
-            agent_manager = AgentManager(
-                connection=connection,
-                text_to_sql_agent=text_to_sql_agent,
-                text_editor_agent=text_editor_agent,
-                chart_editor_agent=chart_editor_agent,
-                web_search_agent=web_search_agent,
-                supervisor_agent=supervisor_agent,
-                embeddings=embeddings,
-                gerente_agent=gerente_agent,
-                run_query_agent=run_query_agent,
-                analista_agent=analista_agent,
-                redator_agent=redator_agent,
-            )
-
-            query_manager = QueryManager(agent_manager=agent_manager)
-            app = Index(
-                query_manager=query_manager,
-                schema_text=schema_text,
-                schema_dados=schema_dados,
-            )
-            app.render()
-        except Exception as e:
-            logging.error(f"Erro ao conectar ao banco: {e}", exc_info=True)
-        finally:
-            if connection:
-                connection.close()
-                logging.info("Conexão com o banco encerrada")
+        query_manager = SessionManager(agent_manager=agent_manager)
+        app = Index(
+            query_manager=query_manager,
+            schema_text=schema_text,
+            exemplary_data=exemplary_data,
+        )
+        app.render()
 
 
 if __name__ == "__main__":

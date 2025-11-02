@@ -2,9 +2,10 @@
 from unittest.mock import MagicMock, patch
 
 import psycopg2
+import psycopg2.extras
 import pytest
 
-from src.infrastructure.db import db
+from src.infrastructure.db import DB
 
 
 def test_get_connection_success():
@@ -12,7 +13,7 @@ def test_get_connection_success():
     with patch(
         "src.infrastructure.db.psycopg2.connect", return_value=mock_conn
     ) as mock_connect:
-        d = db()
+        d = DB("postgres://fake_url")
         conn = d.get_connection("postgres://fake_url")
         mock_connect.assert_called_once_with(
             "postgres://fake_url", cursor_factory=psycopg2.extras.DictCursor
@@ -25,6 +26,6 @@ def test_get_connection_exception():
         "src.infrastructure.db.psycopg2.connect",
         side_effect=psycopg2.OperationalError("Erro de conexão"),
     ):
-        d = db()
+        d = DB("postgres://fake_url")
         with pytest.raises(psycopg2.OperationalError, match="Erro de conexão"):
             d.get_connection("postgres://fake_url")

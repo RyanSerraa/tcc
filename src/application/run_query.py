@@ -1,24 +1,23 @@
 import re
 
-from psycopg2.extras import DictCursor
-
 from src.domain.state import State
+from src.infrastructure.db import DB
 
 
 class RunQuery:
-    def __init__(self, connection):
-        self.connection = connection
+    def __init__(self, db: DB):
+        self.db = db
 
     def run_query(self, state: State):
         try:
-            with self.connection.cursor(cursor_factory=DictCursor) as cursor:
-                query = state.query.strip()
-                cursor.execute(query)
-                if re.match(r"^(select|with)\b", query, re.IGNORECASE):
-                    rows = cursor.fetchall()
-                    return {"result": [dict(row) for row in rows]}
-                else:
-                    self.connection.commit()
-                    return {"affected_rows": cursor.rowcount}
+            query = state.query.strip()
+            if re.match(r"^(select|with)\b", query, re.IGNORECASE):
+                result = self.db.execute_query(query)
+                return {"result": result}
+            else:
+                return {
+                    "status": "error",
+                    "message": "Only SELECT or CTE queries are allowed.",
+                }
         except Exception as e:
             return {"status": "error", "message": str(e)}

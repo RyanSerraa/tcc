@@ -3,7 +3,7 @@ from src.application.agent_orchestrator import AgentManager
 from src.domain.state import State
 
 
-class QueryManager:
+class SessionManager:
 
     def __init__(self, agent_manager: AgentManager):
         self.agent_manager = agent_manager
@@ -17,7 +17,7 @@ class QueryManager:
                 "text_response": result.get("redator_response", {}).get(
                     "final_textual_response"
                 ),
-                "web_search_response": result.get("searchWeb_response"),
+                "web_researcher_response": result.get("web_researcher_response"),
                 "chart_response": result.get("redator_response", {}).get("chart")
                 or result.get("result"),
             }
