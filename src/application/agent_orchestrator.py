@@ -73,7 +73,7 @@ class AgentManager:
         self.workflow.add_conditional_edges(
             "supervisor",
             self.verifySupervisorResponse,
-            {"Sim": "to_sql_query", "Não": "web_researcher"},
+            {"Yes": "to_sql_query", "No": "web_researcher"},
         )
         self.workflow.add_edge("to_sql_query", "run_query")
         self.workflow.add_edge("run_query", "manager")
@@ -98,17 +98,17 @@ class AgentManager:
         self.workflow.add_edge("web_researcher", END)
 
     def verifySupervisorResponse(self, state: State):
-        return "Sim" if state.isEUA else "Não"
+        return "Yes" if state.isEUA else "No"
 
     def verifyManagerResponse(self, state: State):
         decision = state.manager_decision
         outputs = []
 
-        if decision.get("textEditor") == "sim":
+        if decision.get("textEditor") == "yes":
             outputs.append("insight_writer")
-        if decision.get("chartEditor") == "sim":
+        if decision.get("chartEditor") == "yes":
             outputs.append("insight_drawer")
-        if decision.get("analista") == "sim":
+        if decision.get("analista") == "yes":
             outputs.append("insight_reasoner")
 
         return outputs
