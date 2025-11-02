@@ -9,9 +9,9 @@ class InsightEditor:
 
     def respond(self, state: State):
         prompt = (
-            f'Resposta do textEditor: "{state.textEditor_response}"\n'
-            f"Resposta do analista: {state.analista_response}\n "
-            f"Resposta do chartEditor: {state.chartEditor_response}\n"
+            f'Resposta do textEditor: "{state.insight_writer_agent}"\n'
+            f"Resposta do analista: {state.insight_reasoner_agent}\n "
+            f"Resposta do chartEditor: {state.insight_drawer_agent}\n"
             f'Pergunta do usuário: "{state.question}".\n'
             f"Dados: {state.result}"
         )

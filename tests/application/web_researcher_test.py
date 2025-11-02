@@ -18,11 +18,11 @@ def test_web_search_respond():
         query="",
         result="",
         manager_decision={},
-        textEditor_response="",
-        chartEditor_response="",
-        analista_response="",
-        web_researcher_response="",
-        redator_response={},
+        insight_writer_agent="",
+        insight_drawer_agent="",
+        insight_reasoner_agent="",
+        web_researcher_agent="",
+        insight_editor_agent={},
     )
 
     result = web_search.search(state)

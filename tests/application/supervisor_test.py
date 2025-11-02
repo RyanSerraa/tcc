@@ -33,11 +33,11 @@ def test_supervisor_choose_chain_yes():
         query="",
         result="",
         manager_decision={},
-        textEditor_response="",
-        chartEditor_response="",
-        analista_response="",
-        web_researcher_response="",
-        redator_response={},
+        insight_writer_agent="",
+        insight_drawer_agent="",
+        insight_reasoner_agent="",
+        web_researcher_agent="",
+        insight_editor_agent={},
     )
 
     result = supervisor.choose_chain(state, mock_embeddings, mock_db)

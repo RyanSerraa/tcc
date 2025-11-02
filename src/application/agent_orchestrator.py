@@ -114,7 +114,7 @@ class AgentManager:
         return outputs
 
     def verifyInsightEditorResponse(self, state: State):
-        decision = state.redator_response
+        decision = state.insight_editor_agent
         if decision.get("redoChart"):
             return "refazerGrafico"
 

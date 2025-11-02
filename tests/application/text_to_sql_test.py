@@ -27,11 +27,11 @@ def test_text_to_sql_query():
         query="",
         result="",
         manager_decision={},
-        textEditor_response="",
-        chartEditor_response="",
-        analista_response="",
-        web_researcher_response="",
-        redator_response={},
+        insight_writer_agent="",
+        insight_drawer_agent="",
+        insight_reasoner_agent="",
+        web_researcher_agent="",
+        insight_editor_agent={},
     )
 
     result = text_to_sql.to_sql_query(state, mock_embeddings, mock_db)
