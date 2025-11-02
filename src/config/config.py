@@ -12,31 +12,31 @@ class Config:
             os.getenv("TEXT_TO_SQL_AGENT_ENDPOINT"),
             os.getenv("TEXT_TO_SQL_API_KEY"),
         )
-        self.text_editor = (
-            os.getenv("TEXT_EDITOR_AGENT_ENDPOINT"),
-            os.getenv("TEXT_EDITOR_API_KEY"),
+        self.insight_writer = (
+            os.getenv("INSIGHT_WRITER_AGENT_ENDPOINT"),
+            os.getenv("INSIGHT_WRITER_API_KEY"),
         )
-        self.chart_editor = (
-            os.getenv("CHART_EDITOR_AGENT_ENDPOINT"),
-            os.getenv("CHART_EDITOR_API_KEY"),
+        self.insight_drawer = (
+            os.getenv("INSIGHT_DRAWER_AGENT_ENDPOINT"),
+            os.getenv("INSIGHT_DRAWER_API_KEY"),
         )
-        self.web_search = (
-            os.getenv("WEB_SEARCH_AGENT_ENDPOINT"),
-            os.getenv("WEB_SEARCH_API_KEY"),
+        self.web_researcher = (
+            os.getenv("WEB_RESEARCHER_AGENT_ENDPOINT"),
+            os.getenv("WEB_RESEARCHER_API_KEY"),
         )
         self.supervisor = (
             os.getenv("SUPERVISOR_AGENT_ENDPOINT"),
             os.getenv("SUPERVISOR_API_KEY"),
         )
-        self.gerente = (
-            os.getenv("GERENTE_AGENT_ENDPOINT"),
-            os.getenv("GERENTE_API_KEY"),
+        self.manager = (
+            os.getenv("MANAGER_AGENT_ENDPOINT"),
+            os.getenv("MANAGER_API_KEY"),
         )
-        self.analista = (
-            os.getenv("ANALISTA_AGENT_ENDPOINT"),
-            os.getenv("ANALISTA_API_KEY"),
+        self.insight_reasoner = (
+            os.getenv("INSIGHT_REASONER_AGENT_ENDPOINT"),
+            os.getenv("INSIGHT_REASONER_API_KEY"),
         )
-        self.redator = (
-            os.getenv("REDATOR_AGENT_ENDPOINT"),
-            os.getenv("REDATOR_API_KEY"),
+        self.insight_editor = (
+            os.getenv("INSIGHT_EDITOR_AGENT_ENDPOINT"),
+            os.getenv("INSIGHT_EDITOR_API_KEY"),
         )

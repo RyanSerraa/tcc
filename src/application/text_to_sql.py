@@ -1,12 +1,13 @@
 from src.domain.state import State
+from src.infrastructure.db import DB
 
 
 class TextToSQL:
     def __init__(self, agente):
         self.text_to_sql = agente
 
-    def to_sql_query(self, state: State, embeddings, connection):
-        contexto = embeddings.getContext(state.question, "text_to_sql", connection)
+    def to_sql_query(self, state: State, embeddings, db: DB):
+        contexto = embeddings.getContext(state.question, "text_to_sql", db)
         final_prompt = (
             f"Pergunta do usuario:\n{state.question}\n\nContexto relevante:\n{contexto}"
         )

@@ -12,33 +12,33 @@ from src.domain.state import State
 def mock_agents():
     return {
         "text_to_sql_agent": Mock(),
-        "text_editor_agent": Mock(),
-        "chart_editor_agent": Mock(),
-        "web_search_agent": Mock(),
+        "insight_writer_agent": Mock(),
+        "insight_drawer_agent": Mock(),
+        "web_researcher_agent": Mock(),
         "supervisor_agent": Mock(),
         "embeddings": Mock(),
-        "connection": Mock(),
-        "gerente_agent": Mock(),
+        "db": Mock(),
+        "manager_agent": Mock(),
         "run_query_agent": Mock(),
-        "analista_agent": Mock(),
-        "redator_agent": Mock(),
+        "insight_reasoner_agent": Mock(),
+        "insight_editor_agent": Mock(),
     }
 
 
 @pytest.fixture
 def agent_manager(mock_agents):
     return AgentManager(
-        connection=mock_agents["connection"],
+        db=mock_agents["db"],
         text_to_sql_agent=mock_agents["text_to_sql_agent"],
-        text_editor_agent=mock_agents["text_editor_agent"],
-        chart_editor_agent=mock_agents["chart_editor_agent"],
-        web_search_agent=mock_agents["web_search_agent"],
+        insight_writer_agent=mock_agents["insight_writer_agent"],
+        insight_drawer_agent=mock_agents["insight_drawer_agent"],
+        web_researcher_agent=mock_agents["web_researcher_agent"],
         supervisor_agent=mock_agents["supervisor_agent"],
         embeddings=mock_agents["embeddings"],
-        gerente_agent=mock_agents["gerente_agent"],
+        manager_agent=mock_agents["manager_agent"],
         run_query_agent=mock_agents["run_query_agent"],
-        analista_agent=mock_agents["analista_agent"],
-        redator_agent=mock_agents["redator_agent"],
+        insight_reasoner_agent=mock_agents["insight_reasoner_agent"],
+        insight_editor_agent=mock_agents["insight_editor_agent"],
     )
 
 
@@ -48,11 +48,11 @@ def test_verifySupervisorAnswer_yes(agent_manager):
         isEUA=True,
         query="",
         result="",
-        gerente_decision={},
+        manager_decision={},
         textEditor_response="",
         chartEditor_response="",
         analista_response="",
-        searchWeb_response="",
+        web_researcher_response="",
         redator_response={},
     )
     assert agent_manager.verifySupervisorResponse(state) == "Sim"
@@ -64,11 +64,11 @@ def test_verifySupervisorAnswer_no(agent_manager):
         isEUA=False,
         query="",
         result="",
-        gerente_decision={},
+        manager_decision={},
         textEditor_response="",
         chartEditor_response="",
         analista_response="",
-        searchWeb_response="",
+        web_researcher_response="",
         redator_response={},
     )
     assert agent_manager.verifySupervisorResponse(state) == "Não"
@@ -78,14 +78,14 @@ def test_workflow_nodes_exist(agent_manager):
     nodes = agent_manager.workflow.nodes
     expected_nodes = [
         "supervisor",
-        "searchWeb",
+        "web_researcher",
         "to_sql_query",
         "run_query",
-        "textEditor",
-        "chartEditor",
-        "analista",
-        "redator",
-        "gerente",
+        "insight_writer",
+        "insight_drawer",
+        "insight_reasoner",
+        "insight_editor",
+        "manager",
     ]
     for node in expected_nodes:
         assert node in nodes
@@ -95,26 +95,26 @@ def test_workflow_edges_exist(agent_manager):
     edges = agent_manager.workflow.edges
     edge_list = [(from_node, to_node) for from_node, to_node in edges]
     assert ("__start__", "supervisor") in edge_list
-    assert ("searchWeb", "__end__") in edge_list
+    assert ("web_researcher", "__end__") in edge_list
     # Note: redator has conditional edges, not direct edges to __end__
 
 
-def test_redator_conditional_edge_logic(agent_manager):
+def test_insight_editor_conditional_edge_logic(agent_manager):
     # Test when redoChart is True - should go to chartEditor
     state_redo_chart = State(
         question="Test question", redator_response={"redoChart": True}
     )
-    result = agent_manager.verifyRedatorResponse(state_redo_chart)
+    result = agent_manager.verifyInsightEditorResponse(state_redo_chart)
     assert result == "refazerGrafico"
 
     # Test when redoChart is False/None - should go to END
     state_no_redo = State(
         question="Test question", redator_response={"redoChart": False}
     )
-    result = agent_manager.verifyRedatorResponse(state_no_redo)
+    result = agent_manager.verifyInsightEditorResponse(state_no_redo)
     assert result is None
 
     # Test when redator_response is empty
     state_empty = State(question="Test question", redator_response={})
-    result = agent_manager.verifyRedatorResponse(state_empty)
+    result = agent_manager.verifyInsightEditorResponse(state_empty)
     assert result is None

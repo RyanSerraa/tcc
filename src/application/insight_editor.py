@@ -3,9 +3,9 @@ import json
 from src.domain.state import State
 
 
-class Redator:
+class InsightEditor:
     def __init__(self, agente):
-        self.redator_agent = agente
+        self.insight_editor_agent = agente
 
     def respond(self, state: State):
         prompt = (
@@ -15,7 +15,7 @@ class Redator:
             f'Pergunta do usuário: "{state.question}".\n'
             f"Dados: {state.result}"
         )
-        response = self.redator_agent.chat.completions.create(
+        response = self.insight_editor_agent.chat.completions.create(
             model="n/a",
             messages=[{"role": "user", "content": prompt}],
             extra_body={"include_retrieval_info": True},

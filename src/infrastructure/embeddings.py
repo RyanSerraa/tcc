@@ -1,6 +1,8 @@
 import torch
 from langchain_huggingface import HuggingFaceEmbeddings
-from psycopg2.extras import DictCursor, Json
+from psycopg2.extras import Json
+
+from src.infrastructure.db import DB
 
 
 class Embeddings:
@@ -19,28 +21,26 @@ class Embeddings:
     def embed_query(self, question: str):
         return self.embeddings_model.embed_query(question)
 
-    def getContext(self, question: str, agente: str, connection) -> str:
+    def getContext(self, question: str, agente: str, db: DB) -> str:
         query_emb = self.embed_query(question)
         query_emb_vector = Json(query_emb)
         resultados = []
 
-        with connection.cursor(cursor_factory=DictCursor) as cursor:
-            cursor.execute(
-                """
-                SELECT pergunta, resposta
-                FROM rag_documentos
-                WHERE agente = %s
-                ORDER BY embedding_pergunta <-> %s::vector
-                LIMIT 5
-                """,
-                (agente, query_emb_vector),
-            )
-            resultados = cursor.fetchall()
+        resultados = db.execute_query(
+            """
+            SELECT pergunta, resposta
+            FROM rag_documentos
+            WHERE agente = %s
+            ORDER BY embedding_pergunta <-> %s::vector
+            LIMIT 5
+            """,
+            (agente, query_emb_vector),
+        )
 
         contexto = "\n".join(
             [
-                f"{i+1}. Pergunta: {r['pergunta']}\n   Resposta: {r['resposta']}"
-                for i, r in enumerate(resultados)
+                f"{i+1}. Pergunta: {pergunta}\n   Resposta: {resposta}"
+                for i, (pergunta, resposta) in enumerate(resultados)
             ]
         )
         return contexto

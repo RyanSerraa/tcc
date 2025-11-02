@@ -1,13 +1,13 @@
 from src.domain.state import State
 
 
-class Analista:
+class InsightReasoner:
     def __init__(self, agent):
-        self.analista = agent
+        self.insight_reasoner = agent
 
     def respond(self, state: State):
         prompt = f'Pergunta: "{state.question}".\nDados: "{state.result}".\n'
-        response = self.analista.chat.completions.create(
+        response = self.insight_reasoner.chat.completions.create(
             model="n/a",
             messages=[{"role": "user", "content": prompt}],
             extra_body={"include_retrieval_info": True},

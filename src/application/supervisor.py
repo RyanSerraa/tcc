@@ -1,19 +1,24 @@
 import pandas as pd
 
 from src.domain.state import State
+from src.infrastructure.db import DB
 
 
 class Supervisor:
     def __init__(self, agente):
         self.supervisor_agent = agente
-        self.departamentos_set = set(
-            pd.read_csv("src/resources/depts.csv", header=None)[0].str.lower()
-        )
 
-    def choose_chain(self, state: State, embeddings, connection):
+    def choose_chain(self, state: State, embeddings, db: DB):
         question = state.question.lower()
-        hasFoundDept = any(dep.lower() in question for dep in self.departamentos_set)
-        contexto = embeddings.getContext(state.question, "supervisor", connection)
+        depts = db.execute_query(
+            f"""
+            SELECT d.nome
+            FROM ddepartamento d
+            WHERE '{question}' ILIKE CONCAT('%', d.nome, '%') AND d.nome IS NOT NULL
+            """
+        )
+        hasFoundDept = depts != []
+        contexto = embeddings.getContext(state.question, "supervisor", db)
         prompt = (
             f"Contexto relevante:\n{contexto}\n"
             f'Pergunta do usuário: "{state.question}".\n'

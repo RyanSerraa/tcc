@@ -1,39 +1,38 @@
 from unittest.mock import MagicMock
 
-from src.application.gerente import Gerente
+from src.application.insight_editor import InsightEditor
 from src.domain.state import State
 
 
-def test_gerente_respond():
+def test_redator_respond():
     mock_agent = MagicMock()
-    mock_response_json = (
-        '{"textEditor": "Sim", "chartEditor": "Não", "analista": "Sim"}'
-    )
+    # Mock de uma resposta JSON válida
+    mock_response_json = '{"final_textual_response": "Resposta simulada", "chart": null, "redoChart": false}'
     mock_agent.chat.completions.create.return_value.choices = [
         MagicMock(message=MagicMock(content=mock_response_json))
     ]
 
-    gerente = Gerente(mock_agent)
+    insight_editor = InsightEditor(mock_agent)
 
     state = State(
         question="Qual é a capital da Califórnia?",
         isEUA=True,
         query="",
         result="",
-        gerente_decision={},
+        manager_decision={},
         textEditor_response="",
         chartEditor_response="",
         analista_response="",
-        searchWeb_response="",
+        web_researcher_response="",
         redator_response={},
     )
 
-    result = gerente.choose_chain(state)
-    expected_response = {
-        "textEditor": "Sim",
-        "chartEditor": "Não",
-        "analista": "Sim",
-    }
+    result = insight_editor.respond(state)
 
-    assert result["gerente_decision"] == expected_response
+    expected_response = {
+        "final_textual_response": "Resposta simulada",
+        "chart": None,
+        "redoChart": False,
+    }
+    assert result["redator_response"] == expected_response
     mock_agent.chat.completions.create.assert_called_once()

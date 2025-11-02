@@ -29,19 +29,19 @@ def test_getContext_returns_formatted_string():
     ):
         emb = Embeddings()
 
-        mock_cursor = MagicMock()
-        mock_cursor.fetchall.return_value = [
-            {"pergunta": "P1", "resposta": "R1"},
-            {"pergunta": "P2", "resposta": "R2"},
+        mock_db = MagicMock()
+        # Retorna tuplas (pergunta, resposta) - corresponde à implementação atual
+        mock_db.execute_query.return_value = [
+            ("P1", "R1"),
+            ("P2", "R2"),
         ]
-        mock_connection = MagicMock()
-        mock_connection.cursor.return_value.__enter__.return_value = mock_cursor
 
         contexto = emb.getContext(
-            "Qual a principal causa de morte?", "text_to_sql", mock_connection
+            "Qual a principal causa de morte?", "text_to_sql", mock_db
         )
+        print(contexto)
 
-        mock_cursor.execute.assert_called_once()
+        mock_db.execute_query.assert_called_once()
         assert "1. Pergunta: P1" in contexto
         assert "2. Pergunta: P2" in contexto
         assert "Resposta: R1" in contexto

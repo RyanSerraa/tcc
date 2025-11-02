@@ -2,35 +2,36 @@
 from langgraph.graph import END, START, StateGraph
 
 from src.domain.state import State
+from src.infrastructure.db import DB
 
 
 class AgentManager:
 
     def __init__(
         self,
-        connection,
+        db: DB,
         text_to_sql_agent,
-        text_editor_agent,
-        chart_editor_agent,
-        web_search_agent,
+        insight_writer_agent,
+        insight_drawer_agent,
+        web_researcher_agent,
         run_query_agent,
         supervisor_agent,
-        gerente_agent,
+        manager_agent,
         embeddings,
-        analista_agent,
-        redator_agent,
+        insight_reasoner_agent,
+        insight_editor_agent,
     ):
-        self.connection = connection
+        self.db = db
         self.text_to_sql = text_to_sql_agent
-        self.text_editor = text_editor_agent
-        self.chart_editor = chart_editor_agent
-        self.gerente = gerente_agent
-        self.web_search = web_search_agent
+        self.insight_writer = insight_writer_agent
+        self.insight_drawer = insight_drawer_agent
+        self.manager = manager_agent
+        self.web_researcher = web_researcher_agent
         self.embeddings = embeddings
         self.run_query = run_query_agent
         self.supervisor = supervisor_agent
-        self.analista = analista_agent
-        self.redator = redator_agent
+        self.insight_reasoner = insight_reasoner_agent
+        self.insight_editor = insight_editor_agent
         self.workflow = StateGraph(State)
         self._build_workflow()
         self.chain = self.workflow.compile()
@@ -38,78 +39,81 @@ class AgentManager:
     def _build_workflow(self):
         self.workflow.add_node(
             "supervisor",
-            lambda state: self.supervisor.choose_chain(
-                state, self.embeddings, self.connection
-            ),
+            lambda state: self.supervisor.choose_chain(state, self.embeddings, self.db),
         )
-        self.workflow.add_node("searchWeb", lambda state: self.web_search.search(state))
+        self.workflow.add_node(
+            "web_researcher", lambda state: self.web_researcher.search(state)
+        )
         self.workflow.add_node(
             "to_sql_query",
             lambda state: self.text_to_sql.to_sql_query(
-                state, self.embeddings, self.connection
+                state, self.embeddings, self.db
             ),
         )
         self.workflow.add_node(
-            "gerente", lambda state: self.gerente.choose_chain(state)
+            "manager", lambda state: self.manager.choose_chain(state)
         )
         self.workflow.add_node(
             "run_query", lambda state: self.run_query.run_query(state)
         )
         self.workflow.add_node(
-            "chartEditor", lambda state: self.chart_editor.respond(state)
+            "insight_drawer", lambda state: self.insight_drawer.respond(state)
         )
         self.workflow.add_node(
-            "textEditor", lambda state: self.text_editor.respond(state)
+            "insight_writer", lambda state: self.insight_writer.respond(state)
         )
-        self.workflow.add_node("analista", lambda state: self.analista.respond(state))
-        self.workflow.add_node("redator", lambda state: self.redator.respond(state))
+        self.workflow.add_node(
+            "insight_reasoner", lambda state: self.insight_reasoner.respond(state)
+        )
+        self.workflow.add_node(
+            "insight_editor", lambda state: self.insight_editor.respond(state)
+        )
 
         self.workflow.add_edge(START, "supervisor")
         self.workflow.add_conditional_edges(
             "supervisor",
             self.verifySupervisorResponse,
-            {"Sim": "to_sql_query", "Não": "searchWeb"},
+            {"Sim": "to_sql_query", "Não": "web_researcher"},
         )
         self.workflow.add_edge("to_sql_query", "run_query")
-        self.workflow.add_edge("run_query", "gerente")
+        self.workflow.add_edge("run_query", "manager")
         self.workflow.add_conditional_edges(
-            "gerente",
-            self.verifyGerenteResponse,
+            "manager",
+            self.verifyManagerResponse,
             {
-                "textEditor": "textEditor",
-                "chartEditor": "chartEditor",
-                "analista": "analista",
+                "insight_writer": "insight_writer",
+                "insight_drawer": "insight_drawer",
+                "insight_reasoner": "insight_reasoner",
             },
         )
 
-        self.workflow.add_edge("textEditor", "redator")
-        self.workflow.add_edge("chartEditor", "redator")
-        self.workflow.add_edge("analista", "redator")
-        # self.workflow.add_edge("redator", END)
+        self.workflow.add_edge("insight_writer", "insight_editor")
+        self.workflow.add_edge("insight_drawer", "insight_editor")
+        self.workflow.add_edge("insight_reasoner", "insight_editor")
         self.workflow.add_conditional_edges(
-            "redator",
-            self.verifyRedatorResponse,
-            {"refazerGrafico": "chartEditor", None: END},
+            "insight_editor",
+            self.verifyInsightEditorResponse,
+            {"refazerGrafico": "insight_drawer", None: END},
         )
-        self.workflow.add_edge("searchWeb", END)
+        self.workflow.add_edge("web_researcher", END)
 
     def verifySupervisorResponse(self, state: State):
         return "Sim" if state.isEUA else "Não"
 
-    def verifyGerenteResponse(self, state: State):
-        decision = state.gerente_decision
+    def verifyManagerResponse(self, state: State):
+        decision = state.manager_decision
         outputs = []
 
         if decision.get("textEditor") == "sim":
-            outputs.append("textEditor")
+            outputs.append("insight_writer")
         if decision.get("chartEditor") == "sim":
-            outputs.append("chartEditor")
+            outputs.append("insight_drawer")
         if decision.get("analista") == "sim":
-            outputs.append("analista")
+            outputs.append("insight_reasoner")
 
         return outputs
 
-    def verifyRedatorResponse(self, state: State):
+    def verifyInsightEditorResponse(self, state: State):
         decision = state.redator_response
         if decision.get("redoChart"):
             return "refazerGrafico"

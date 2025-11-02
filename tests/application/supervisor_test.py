@@ -17,6 +17,9 @@ def test_supervisor_choose_chain_yes():
     mock_embeddings = MagicMock()
     mock_embeddings.getContext.return_value = "contexto relevante"
 
+    mock_db = MagicMock()
+    mock_db.execute_query.return_value = [{"nome": "Finance"}]
+
     # Cria um DataFrame simulado
     df_mock = pd.DataFrame({0: ["Finance"]})
 
@@ -29,18 +32,18 @@ def test_supervisor_choose_chain_yes():
         isEUA=True,
         query="",
         result="",
-        gerente_decision={},
+        manager_decision={},
         textEditor_response="",
         chartEditor_response="",
         analista_response="",
-        searchWeb_response="",
+        web_researcher_response="",
         redator_response={},
     )
 
-    result = supervisor.choose_chain(state, mock_embeddings, None)
+    result = supervisor.choose_chain(state, mock_embeddings, mock_db)
 
     assert result["isEUA"] is True
     mock_agent.chat.completions.create.assert_called_once()
     mock_embeddings.getContext.assert_called_once_with(
-        state.question, "supervisor", None
+        state.question, "supervisor", mock_db
     )
