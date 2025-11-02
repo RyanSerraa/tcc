@@ -1,4 +1,3 @@
-import pandas as pd
 
 from src.domain.state import State
 from src.infrastructure.db import DB

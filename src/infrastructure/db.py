@@ -1,8 +1,9 @@
+from concurrent.futures import ThreadPoolExecutor
+from typing import Any, Optional, Tuple
+
+import pandas as pd
 import psycopg2
 from psycopg2.extras import DictCursor
-from typing import Optional, Tuple, Any
-from concurrent.futures import ThreadPoolExecutor
-import pandas as pd
 
 
 class DB:

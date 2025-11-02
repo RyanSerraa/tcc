@@ -1,4 +1,3 @@
-import pandas as pd
 import streamlit as st
 
 from src.application.insight_drawer import InsightDrawer

@@ -1,17 +1,17 @@
 import json
 import logging
-from typing import Any, Dict
+from typing import Any
 
 from config.config import Config
 from src.application.agent_orchestrator import AgentManager
-from src.application.insight_reasoner import InsightReasoner
 from src.application.insight_drawer import InsightDrawer
-from src.application.manager import Manager
-from src.application.session_manager import SessionManager
 from src.application.insight_editor import InsightEditor
-from src.application.run_query import RunQuery
-from src.application.supervisor import Supervisor
+from src.application.insight_reasoner import InsightReasoner
 from src.application.insight_writer import InsightWriter
+from src.application.manager import Manager
+from src.application.run_query import RunQuery
+from src.application.session_manager import SessionManager
+from src.application.supervisor import Supervisor
 from src.application.text_to_sql import TextToSQL
 from src.application.web_researcher import WebResearcher
 from src.infrastructure.ai_agents import Agents
