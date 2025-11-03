@@ -9,8 +9,8 @@ class State:
     query: str = ""
     result: str = ""
     manager_decision: Dict = field(default_factory=dict)
-    textEditor_response: str = ""
-    chartEditor_response: str = ""
-    analista_response: str = ""
+    insight_writer_response: str = ""
+    insight_drawer_response: str = ""
+    insight_reasoner_response: str = ""
     web_researcher_response: str = ""
-    redator_response: Dict = field(default_factory=dict)
+    insight_editor_response: Dict = field(default_factory=dict)

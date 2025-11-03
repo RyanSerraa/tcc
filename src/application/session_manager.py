@@ -14,11 +14,11 @@ class SessionManager:
             result = self.agent_manager.chain.invoke(state)
             return {
                 "success": True,
-                "text_response": result.get("redator_response", {}).get(
+                "text_response": result.get("insight_editor_response", {}).get(
                     "final_textual_response"
                 ),
                 "web_researcher_response": result.get("web_researcher_response"),
-                "chart_response": result.get("redator_response", {}).get("chart")
+                "chart_response": result.get("insight_editor_response", {}).get("chart")
                 or result.get("result"),
             }
         except Exception as e:

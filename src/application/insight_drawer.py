@@ -10,10 +10,10 @@ class InsightDrawer:
         self.insight_drawer = agent
 
     def respond(self, state: State):
-        refazer_grafico = state.redator_response.get("redoChart")
+        refazer_grafico = state.insight_editor_response.get("redoChart")
         base_prompt = f'Pergunta: "{state.question}".\nDados: "{state.result}".\n'
         if refazer_grafico:
-            base_prompt += f"Refazer gráfico: {state.chartEditor_response}\n"
+            base_prompt += f"Refazer gráfico: {state.insight_drawer_response}\n"
         response = self.insight_drawer.chat.completions.create(
             model="n/a",
             messages=[{"role": "user", "content": base_prompt}],
@@ -25,7 +25,7 @@ class InsightDrawer:
             else ""
         )
         response_json = json.loads(content)
-        return {"chartEditor_response": response_json}
+        return {"insight_drawer_response": response_json}
 
     @staticmethod
     def mountChart(graph_json):

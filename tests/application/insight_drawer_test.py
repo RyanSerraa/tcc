@@ -19,15 +19,15 @@ def test_chart_editor_respond():
         query="",
         result="",
         manager_decision={},
-        textEditor_response="",
-        chartEditor_response="",
-        analista_response="",
+        insight_writer_response="",
+        insight_drawer_response="",
+        insight_reasoner_response="",
         web_researcher_response="",
-        redator_response={},
+        insight_editor_response={},
     )
 
     result = insight_drawer.respond(state)
     expected_response = {"teste": "valor"}
 
-    assert result["chartEditor_response"] == expected_response
+    assert result["insight_drawer_response"] == expected_response
     mock_agent.chat.completions.create.assert_called_once()

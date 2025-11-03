@@ -7,7 +7,7 @@ def test_consultar_dados_sucesso():
     # Mock do AgentManager
     mock_agent_manager = MagicMock()
     mock_agent_manager.chain.invoke.return_value = {
-        "redator_response": {
+        "insight_editor_response": {
             "final_textual_response": "Resultado simulado",
             "chart": None,
         },

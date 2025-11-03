@@ -93,7 +93,7 @@ class AgentManager:
         self.workflow.add_conditional_edges(
             "insight_editor",
             self.verifyInsightEditorResponse,
-            {"refazerGrafico": "insight_drawer", None: END},
+            {"redoChart": "insight_drawer", None: END},
         )
         self.workflow.add_edge("web_researcher", END)
 
@@ -104,18 +104,18 @@ class AgentManager:
         decision = state.manager_decision
         outputs = []
 
-        if decision.get("textEditor") == "yes":
+        if decision.get("insightWriter") == "yes":
             outputs.append("insight_writer")
-        if decision.get("chartEditor") == "yes":
+        if decision.get("insightDrawer") == "yes":
             outputs.append("insight_drawer")
-        if decision.get("analista") == "yes":
+        if decision.get("insightReasoner") == "yes":
             outputs.append("insight_reasoner")
 
         return outputs
 
     def verifyInsightEditorResponse(self, state: State):
-        decision = state.redator_response
+        decision = state.insight_editor_response
         if decision.get("redoChart"):
-            return "refazerGrafico"
+            return "redoChart"
 
         return None

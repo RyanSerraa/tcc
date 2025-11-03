@@ -9,9 +9,9 @@ class InsightEditor:
 
     def respond(self, state: State):
         prompt = (
-            f'Resposta do textEditor: "{state.textEditor_response}"\n'
-            f"Resposta do analista: {state.analista_response}\n "
-            f"Resposta do chartEditor: {state.chartEditor_response}\n"
+            f'Resposta do insightWriter: "{state.insight_writer_response}"\n'
+            f"Resposta do insightReasoner: {state.insight_reasoner_response}\n "
+            f"Resposta do insightDrawer: {state.insight_drawer_response}\n"
             f'Pergunta do usuário: "{state.question}".\n'
             f"Dados: {state.result}"
         )
@@ -24,4 +24,4 @@ class InsightEditor:
             response.choices[0].message.content.strip() if response.choices else ""
         )
         response = json.loads(content)
-        return {"redator_response": response}
+        return {"insight_editor_response": response}
