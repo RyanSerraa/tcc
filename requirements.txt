@@ -1,17 +1,13 @@
 sentence-transformers
 streamlit
-langchain-core
-langchain-community
 psycopg2-binary
 python-dotenv
 pandas
 openai
-typing-extensions
 langgraph
 pytest
 ruff
 isort
 black
-numpy
 pytest-cov
 plotly
