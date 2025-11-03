@@ -1,6 +1,7 @@
 import json
 import logging
 from typing import Any
+
 import streamlit as st
 
 from config.config import Config

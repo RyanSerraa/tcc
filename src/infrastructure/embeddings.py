@@ -1,5 +1,5 @@
-from sentence_transformers import SentenceTransformer
 from psycopg2.extras import Json
+from sentence_transformers import SentenceTransformer
 
 from src.infrastructure.db import DB
 
