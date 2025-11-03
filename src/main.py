@@ -34,22 +34,22 @@ class Main:
                 return json.load(f)
             return f.read()
 
-    @st.cache_resource
+    @st.cache_resource(show_spinner=False)
     def initialize_embeddings(_self):
         return Embeddings()
 
-    @st.cache_resource
+    @st.cache_resource(show_spinner=False)
     def initialize_db(_self):
         if _self.config.db_url is None:
             logging.error("Database URL is not configured.")
             return None
         return DB(_self.config.db_url)
 
-    @st.cache_resource
+    @st.cache_resource(show_spinner=False)
     def initialize_exemplary_data(_self, _db):
         return _db.getExemplaryData()
 
-    @st.cache_resource
+    @st.cache_resource(show_spinner=False)
     def initialize_agents(_self, _db, _embeddings):
         try:
             text_to_sql_agent = TextToSQL(Agents.load_agent(*_self.config.text_to_sql))
@@ -93,7 +93,7 @@ class Main:
             logging.error(f"Erro ao carregar agentes: {e}", exc_info=True)
             return None
 
-    @st.cache_resource
+    @st.cache_resource(show_spinner=False)
     def initialize_query_manager(_self, _agent_manager: AgentManager):
         return SessionManager(_agent_manager)
 
