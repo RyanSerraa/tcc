@@ -55,7 +55,7 @@ def test_verifySupervisorAnswer_yes(agent_manager):
         web_researcher_response="",
         redator_response={},
     )
-    assert agent_manager.verifySupervisorResponse(state) == "Sim"
+    assert agent_manager.verifySupervisorResponse(state) == "Yes"
 
 
 def test_verifySupervisorAnswer_no(agent_manager):
@@ -71,7 +71,7 @@ def test_verifySupervisorAnswer_no(agent_manager):
         web_researcher_response="",
         redator_response={},
     )
-    assert agent_manager.verifySupervisorResponse(state) == "Não"
+    assert agent_manager.verifySupervisorResponse(state) == "No"
 
 
 def test_workflow_nodes_exist(agent_manager):
