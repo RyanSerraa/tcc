@@ -1,6 +1,4 @@
-sentence-transformers==3.2.1
-torch==2.2.2
-langchain-huggingface>=0.0.10
+sentence-transformers
 streamlit
 langchain-core
 langchain-community
@@ -14,6 +12,6 @@ pytest
 ruff
 isort
 black
-numpy==1.26.4
+numpy
 pytest-cov
 plotly
