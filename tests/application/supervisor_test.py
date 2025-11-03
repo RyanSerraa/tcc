@@ -10,7 +10,7 @@ def test_supervisor_choose_chain_yes():
     # Mock do agente
     mock_agent = MagicMock()
     mock_agent.chat.completions.create.return_value.choices = [
-        MagicMock(message=MagicMock(content="Sim"))
+        MagicMock(message=MagicMock(content="Yes"))
     ]
 
     # Mock do embeddings

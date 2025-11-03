@@ -6,17 +6,15 @@ from src.infrastructure.embeddings import Embeddings
 
 def test_embed_query_called():
     mock_model = MagicMock()
-    mock_model.embed_query.return_value = [0.1, 0.2, 0.3]
+    mock_model.encode.return_value = [0.1, 0.2, 0.3]
 
-    # Mocka a classe HuggingFaceEmbeddings para que Embeddings use o mock
+    # Mocka a classe SentenceTransformer para que Embeddings use o mock
     with patch(
-        "src.infrastructure.embeddings.HuggingFaceEmbeddings", return_value=mock_model
+        "src.infrastructure.embeddings.SentenceTransformer", return_value=mock_model
     ):
         emb = Embeddings()  # vai usar mock_model
         result = emb.embed_query("Qual a principal causa de morte?")
-        mock_model.embed_query.assert_called_once_with(
-            "Qual a principal causa de morte?"
-        )
+        mock_model.encode.assert_called_once_with("Qual a principal causa de morte?")
         assert result == [0.1, 0.2, 0.3]
 
 
@@ -25,7 +23,7 @@ def test_getContext_returns_formatted_string():
     mock_model.embed_query.return_value = [0.1, 0.2, 0.3]
 
     with patch(
-        "src.infrastructure.embeddings.HuggingFaceEmbeddings", return_value=mock_model
+        "src.infrastructure.embeddings.SentenceTransformer", return_value=mock_model
     ):
         emb = Embeddings()
 
