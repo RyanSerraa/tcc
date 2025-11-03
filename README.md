@@ -61,7 +61,7 @@ sudo pkill -f streamlit
 source venv/bin/activate
 
 # Execute o Streamlit em segundo plano, permitindo acesso externo na porta 8501
-nohup env PYTHONPATH=. streamlit run src/main.py --server.port 8501 --server.address 0.0.0.0 &
+nohup env PYTHONPATH=. streamlit run src/main.py --server.port 8501 --server.address 0.0.0.0 > streamlit.log 2>&1 &
 ```
 
 > **Dica:** O comando `nohup` garante que o Streamlit continue rodando mesmo após o logout da sessão SSH.
