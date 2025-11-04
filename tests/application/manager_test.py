@@ -7,7 +7,7 @@ from src.domain.state import State
 def test_gerente_respond():
     mock_agent = MagicMock()
     mock_response_json = (
-        '{"textEditor": "Sim", "chartEditor": "Não", "analista": "Sim"}'
+        '{"insightWriter": "Sim", "insightDrawer": "Não", "insightReasoner": "Sim"}'
     )
     mock_agent.chat.completions.create.return_value.choices = [
         MagicMock(message=MagicMock(content=mock_response_json))
@@ -21,18 +21,18 @@ def test_gerente_respond():
         query="",
         result="",
         manager_decision={},
-        textEditor_response="",
-        chartEditor_response="",
-        analista_response="",
+        insight_writer_response="",
+        insight_drawer_response="",
+        insight_reasoner_response="",
         web_researcher_response="",
-        redator_response={},
+        insight_editor_response={},
     )
 
     result = manager.choose_chain(state)
     expected_response = {
-        "textEditor": "Sim",
-        "chartEditor": "Não",
-        "analista": "Sim",
+        "insightWriter": "Sim",
+        "insightDrawer": "Não",
+        "insightReasoner": "Sim",
     }
 
     assert result["manager_decision"] == expected_response

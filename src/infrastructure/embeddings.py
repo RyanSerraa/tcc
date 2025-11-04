@@ -32,8 +32,8 @@ class Embeddings:
 
         contexto = "\n".join(
             [
-                f"{i+1}. Pergunta: {pergunta}\n   Resposta: {resposta}"
-                for i, (pergunta, resposta) in enumerate(resultados)
+                f"{i+1}. Pergunta: {item['pergunta']}\n   Resposta: {item['resposta']}"
+                for i, item in enumerate(resultados)
             ]
         )
         return contexto

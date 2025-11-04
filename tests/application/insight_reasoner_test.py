@@ -18,14 +18,14 @@ def test_analista_respond():
         query="",
         result="",
         manager_decision={},
-        textEditor_response="",
-        chartEditor_response="",
-        analista_response="",
+        insight_writer_response="",
+        insight_drawer_response="",
+        insight_reasoner_response="",
         web_researcher_response="",
-        redator_response={},
+        insight_editor_response={},
     )
 
     result = insight_reasoner.respond(state)
 
-    assert result["analista_response"] == "Resposta simulada"
+    assert result["insight_reasoner_response"] == "Resposta simulada"
     mock_agent.chat.completions.create.assert_called_once()

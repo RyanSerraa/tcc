@@ -17,4 +17,4 @@ class InsightWriter:
             if response.choices and hasattr(response.choices[0].message, "content")
             else ""
         )
-        return {"textEditor_response": content}
+        return {"insight_writer_response": content}

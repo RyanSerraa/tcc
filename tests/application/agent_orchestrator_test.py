@@ -49,11 +49,11 @@ def test_verifySupervisorAnswer_yes(agent_manager):
         query="",
         result="",
         manager_decision={},
-        textEditor_response="",
-        chartEditor_response="",
-        analista_response="",
+        insight_writer_response="",
+        insight_drawer_response="",
+        insight_reasoner_response="",
         web_researcher_response="",
-        redator_response={},
+        insight_editor_response={},
     )
     assert agent_manager.verifySupervisorResponse(state) == "Yes"
 
@@ -65,11 +65,11 @@ def test_verifySupervisorAnswer_no(agent_manager):
         query="",
         result="",
         manager_decision={},
-        textEditor_response="",
-        chartEditor_response="",
-        analista_response="",
+        insight_writer_response="",
+        insight_drawer_response="",
+        insight_reasoner_response="",
         web_researcher_response="",
-        redator_response={},
+        insight_editor_response={},
     )
     assert agent_manager.verifySupervisorResponse(state) == "No"
 
@@ -102,19 +102,17 @@ def test_workflow_edges_exist(agent_manager):
 def test_insight_editor_conditional_edge_logic(agent_manager):
     # Test when redoChart is True - should go to chartEditor
     state_redo_chart = State(
-        question="Test question", redator_response={"redoChart": True}
+        question="Test question", insight_editor_response={"redoChart": True}
     )
     result = agent_manager.verifyInsightEditorResponse(state_redo_chart)
-    assert result == "refazerGrafico"
+    assert result == "redoChart"
 
-    # Test when redoChart is False/None - should go to END
     state_no_redo = State(
-        question="Test question", redator_response={"redoChart": False}
+        question="Test question", insight_editor_response={"redoChart": False}
     )
     result = agent_manager.verifyInsightEditorResponse(state_no_redo)
     assert result is None
 
-    # Test when redator_response is empty
-    state_empty = State(question="Test question", redator_response={})
+    state_empty = State(question="Test question", insight_editor_response={})
     result = agent_manager.verifyInsightEditorResponse(state_empty)
     assert result is None

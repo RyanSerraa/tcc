@@ -17,4 +17,4 @@ class InsightReasoner:
             if response.choices and hasattr(response.choices[0].message, "content")
             else ""
         )
-        return {"analista_response": content}
+        return {"insight_reasoner_response": content}
